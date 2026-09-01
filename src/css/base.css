@@ -1,0 +1,24 @@
+/* GENERATED from src/tokens — edit tokens, then `bun run generate`. Shared web base styles; import after the Tailwind entry. */
+
+/* All scrollbars: pill thumb only, no track. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d7d3c9 transparent;
+}
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d7d3c9;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a9b2aa;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}

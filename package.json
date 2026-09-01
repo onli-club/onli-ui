@@ -1,0 +1,56 @@
+{
+  "name": "@onli/ui",
+  "version": "0.1.0",
+  "private": true,
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tokens": "./src/tokens/index.ts",
+    "./fonts": "./src/fonts.ts",
+    "./tailwind/preset": "./src/tailwind/preset.js",
+    "./css/theme.css": "./src/css/theme.css",
+    "./css/fonts-web.css": "./src/css/fonts-web.css",
+    "./css/base.css": "./src/css/base.css",
+    "./channel-icons": "./src/channel-icons.ts",
+    "./badge-icons": "./src/badge-icons.ts",
+    "./badge-medal-svg": "./src/badge-medal-svg.ts",
+    "./rank-insignia": "./src/rank-insignia.ts",
+    "./rank-insignia-svg": "./src/rank-insignia-svg.ts"
+  },
+  "scripts": {
+    "generate": "bun scripts/generate.ts",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit",
+    "fetch-icons": "bun scripts/fetch-channel-icons.ts",
+    "build-badge-icons": "bun scripts/build-badge-icons.ts",
+    "build-rank-insignia": "bun scripts/build-rank-insignia.ts"
+  },
+  "peerDependencies": {
+    "@expo-google-fonts/geist": "*",
+    "expo-font": "*",
+    "lucide-react-native": "*",
+    "nativewind": "^4",
+    "react": "*",
+    "react-native": "*",
+    "react-native-svg": "*"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.10",
+    "@expo-google-fonts/geist": "^0.4.2",
+    "@types/bun": "^1.4.0",
+    "@types/react": "~19.2.2",
+    "expo-font": "~57.0.1",
+    "lucide-react-native": "^0.545.0",
+    "nativewind": "^4.2.6",
+    "react": "19.2.3",
+    "react-native": "0.86.2",
+    "react-native-svg": "15.15.4",
+    "tailwindcss": "^3.4",
+    "typescript": "~6.0.3"
+  }
+}

@@ -1,0 +1,26 @@
+/* GENERATED from src/tokens — edit tokens, then `bun run generate`. Web consumers only; @import after theme.css.
+   Requires Geist from Google Fonts — add to the host HTML <head>:
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap"> */
+@theme {
+  --font-display: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-body-md: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-body-bold: "Geist", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  .font-display {
+    font-weight: 700;
+  }
+  .font-body {
+    font-weight: 400;
+  }
+  .font-body-md {
+    font-weight: 500;
+  }
+  .font-body-bold {
+    font-weight: 600;
+  }
+}
