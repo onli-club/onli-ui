@@ -39,6 +39,26 @@
     "react-native": "*",
     "react-native-svg": "*"
   },
+  "peerDependenciesMeta": {
+    "@expo-google-fonts/geist": {
+      "optional": true
+    },
+    "expo-font": {
+      "optional": true
+    },
+    "lucide-react-native": {
+      "optional": true
+    },
+    "nativewind": {
+      "optional": true
+    },
+    "react-native": {
+      "optional": true
+    },
+    "react-native-svg": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@biomejs/biome": "^2.5.10",
     "@expo-google-fonts/geist": "^0.4.2",

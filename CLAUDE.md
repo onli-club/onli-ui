@@ -25,7 +25,7 @@ Token-first design system shared by `onli-app` (NativeWind 4 / Tailwind 3.4), `o
 - No new runtime dependencies; anything a component needs must be a peerDependency the app
   already has (react-native-svg, lucide-react-native, expo-font, the two font packages).
 - Consumers install this repo from git (`"@onli/ui": "github:onli-club/onli-ui#main"`), so a
-  change is only visible to them once it is pushed and they `bun install`; onli-app's Metro
+  change is only visible to them once it is pushed and they run `bun update @onli/ui`; onli-app's Metro
   serves the sibling checkout live for local work. Breaking API changes must be applied to
   `onli-app` in the same working session.
 
