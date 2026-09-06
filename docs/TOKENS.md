@@ -1,7 +1,9 @@
 # Tokens
 
 Source: `src/tokens/`. After any change run `bun run generate` and commit the regenerated
-`src/tailwind/preset.js`, `src/css/theme.css`, `src/css/base.css`, and `src/css/fonts-web.css`.
+`src/tailwind/preset.js`, `src/css/theme.css`, `src/css/base.css`, `src/css/fonts-web.css`,
+and `src/tokens/dist/` (plain ESM `.mjs` + `.d.mts`, what `@onli/ui/tokens` resolves to — onli-server
+imports it for email templates and has no TypeScript loader in front of `node_modules`).
 
 ## Visual language
 
@@ -21,15 +23,15 @@ sessions (light, low-glare, high contrast for a 30–45 audience).
 | `surface` | `bg-surface` | Cards, inputs, bars |
 | `surface-sunken` | `bg-surface-sunken` | Wells, segmented track, skeletons |
 | `surface-hover` / `surface-press` | `hover:bg-surface-hover` | Interactive states. Hover/press are ONE translucent black wash (5% / 10%) — identical on every background; use this pair on every TRANSPARENT-RESTING pressable (rows, icon buttons, tabs, ghost buttons). A translucent bg REPLACES an opaque fill (the element goes see-through and composites with the PAGE instead — reads darker, like a double hover), so FILLED controls use precomputed fill+wash colors instead: white fills → `surface-solid-hover`/`-press` (#F2F2F2/#E6E6E6), sunken chips → `surface-sunken-hover`/`-press` (sand-300/400), brand fills → `brand-strong`/`brand-deep`, tonal fills → `hover:bg-brand/20 active:bg-brand/30` (same for `danger`). |
-| `ink` / `ink-secondary` / `ink-muted` / `ink-faint` | `text-ink-secondary` | Text hierarchy. `muted` is the floor for readable text incl. placeholders; `faint` is decorative only (chevrons, dividers) |
+| `ink` / `ink-secondary` / `ink-muted` / `ink-faint` | `text-ink-secondary` | Text hierarchy. `muted` (#5D6961, ≥4.5:1 on white, paper **and** sunken) is the floor for readable text incl. placeholders, inactive tabs and neutral pills; `faint` (2.2:1) is for dividers and separators only — never text, never a functional glyph (chevrons, lock, cancelled marks use `muted`) |
 | `ink-inverse` | `text-ink-inverse` | Text on dark/brand fills |
-| `line` / `line-strong` | `border-line` | Hairlines; `-strong` for inputs/emphasis |
+| `line` / `line-strong` / `line-input` | `border-line` | Hairlines (`sand-300`); `-strong` (`sand-400`) for buttons, spinners and emphasis; `-input` (#858D85, 3.2:1 on white) is the boundary of every text field so it is visible before focus (WCAG 1.4.11) |
 | `focus` | `focus:border-focus` | Focus rings/borders |
 | `brand` / `brand-strong` / `brand-deep` | `bg-brand` | Primary actions; strong/deep = hover/pressed |
 | `brand-subtle` / `brand-faint` | `bg-brand-subtle` | Tonal fills, selected states |
 | `on-brand` | `text-on-brand` | Text/icons on brand fills |
 | `accent` / `accent-strong` / `accent-subtle` | `bg-accent-subtle` | Gamification only. `accent` fails contrast as text — use `accent-strong` for text |
-| `heat-1` … `heat-4` | `bg-heat-3` | Activity-grid intensity ramp only (light→dark). Level 0 is `surface-sunken`, not a heat token |
+| `heat-1` … `heat-4` | `bg-heat-3` | Activity-grid intensity ramp only (green-400 → 500 → 700 → 900). Starts at green-400 so a one-action day is ≥3:1 against the card. Level 0 is `surface-sunken`, not a heat token |
 
 | `danger` / `danger-strong` / `danger-subtle` | `text-danger` | Destructive |
 | `like` | `text-like` | Filled like/heart |
@@ -62,8 +64,11 @@ utilities; Android cannot synthesize weights for custom fonts):
 | `font-body-md` | Geist 500 |
 | `font-body-bold` | Geist 600 |
 
-Sizes `text-xs`(12/16) `sm`(14/20) `md`(15/22, dense body copy: feed bodies, list rows,
-sidebar) `base`(16/24) `lg`(18/26) `xl`(20/28) `2xl`(24/30) `3xl`(28/34).
+Sizes `text-xs`(12/16) `sm`(14/20) `base`(16/24) `lg`(18/26) `xl`(20/28) `2xl`(24/30)
+`3xl`(28/34). Five text steps on purpose: the 15px `md` step was dropped on 2026-09-05 —
+14/15/16 were indistinguishable at arm's length on the audience's phones — and nothing goes
+below 12 (pills are 12, the count badge 11). User content (post bodies, comments, bios) is
+`base`; dense chrome (rows, sidebar) is `sm`.
 Prefer the `Text` component's `variant` (and `size` prop for scale steps) over raw classes.
 
 ## Shape, elevation, layout

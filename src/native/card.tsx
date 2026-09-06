@@ -21,6 +21,7 @@ export function Card({
   if (!onPress) return <View className={classes}>{children}</View>;
   return (
     <Pressable
+      accessibilityRole="button"
       onPress={onPress}
       className={cn(
         classes,

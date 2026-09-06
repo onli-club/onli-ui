@@ -14,13 +14,18 @@ export function Segmented<T extends string>({
   className?: string;
 }) {
   return (
-    <View className={cn("flex-row gap-1 self-start rounded-full bg-surface-sunken p-1", className)}>
+    <View
+      accessibilityRole="tablist"
+      className={cn("flex-row gap-1 self-start rounded-full bg-surface-sunken p-1", className)}
+    >
       {options.map((o) => {
         const active = o.value === value;
         return (
           <Pressable
             key={o.value}
-            accessibilityRole="button"
+            accessibilityRole="tab"
+            accessibilityState={{ selected: active }}
+            hitSlop={6}
             onPress={() => onChange(o.value)}
             className={cn(
               "rounded-full px-4 py-1.5 transition-colors",

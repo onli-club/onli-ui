@@ -6,9 +6,9 @@ import { Icon } from "./icon";
 import { Text, type TextTone } from "./text";
 
 const SIZES = {
-  sm: { box: "h-9 px-4 gap-1.5 rounded-full", text: "text-sm", icon: 15 },
-  md: { box: "h-11 px-5 gap-2 rounded-full", text: "text-sm", icon: 17 },
-  lg: { box: "h-12 px-7 gap-2 rounded-full", text: "text-base", icon: 19 },
+  sm: { box: "min-h-9 px-4 gap-1.5 rounded-full", text: "text-sm", icon: 15 },
+  md: { box: "min-h-11 px-5 gap-2 rounded-full", text: "text-sm", icon: 17 },
+  lg: { box: "min-h-12 px-7 gap-2 rounded-full", text: "text-base", icon: 19 },
 } as const;
 
 const VARIANTS = {
@@ -71,6 +71,8 @@ export function Button({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ busy: loading }}
       className={cn(
         "flex-row items-center justify-center transition-colors",
         s.box,

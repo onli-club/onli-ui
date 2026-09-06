@@ -13,6 +13,7 @@ export function ListRow({
   chevron = false,
   dense = false,
   onPress,
+  accessibilityRole = "button",
   className,
 }: {
   title: string;
@@ -23,6 +24,8 @@ export function ListRow({
   /** Compact row (rails, secondary lists): tighter padding, label-weight title. */
   dense?: boolean;
   onPress?: () => void;
+  /** `link` when the row navigates. */
+  accessibilityRole?: "button" | "link";
   className?: string;
 }) {
   const body = (
@@ -39,13 +42,14 @@ export function ListRow({
         ) : null}
       </View>
       {right ? <View className="ml-3">{right}</View> : null}
-      {chevron ? <Icon icon={ChevronRight} size={dense ? 16 : 18} tone="ink-faint" /> : null}
+      {chevron ? <Icon icon={ChevronRight} size={dense ? 16 : 18} tone="ink-muted" /> : null}
     </>
   );
   const classes = cn("flex-row items-center", dense ? "px-4 py-3.5" : "px-5 py-4", className);
   if (!onPress) return <View className={classes}>{body}</View>;
   return (
     <Pressable
+      accessibilityRole={accessibilityRole}
       onPress={onPress}
       className={cn(classes, "transition-colors hover:bg-surface-hover active:bg-surface-press")}
     >

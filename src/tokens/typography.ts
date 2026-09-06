@@ -31,8 +31,6 @@ export const webFontFamily = "Geist";
 export const fontSizes = {
   xs: [12, 16],
   sm: [14, 20],
-  // between sm and base: dense body copy (feed bodies, list rows, sidebar)
-  md: [15, 22],
   base: [16, 24],
   lg: [18, 26],
   xl: [20, 28],

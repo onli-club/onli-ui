@@ -5,67 +5,87 @@ margins/layout tweaks only — visual identity stays inside the component. Avata
 ConfirmButton, and Icon take no `className`. Import from `@onli/ui`.
 
 ## Text
-`<Text variant tone size className …TextProps>`
+`<Text variant tone size className …TextProps>` — caps OS font scaling at 1.3× for chrome
+and 2× for `selectable` user content (`maxFontSizeMultiplier` overrides). Controls use
+`min-h-*`, never `h-*`, so scaled text never clips.
 - `variant`: `title` (section titles), `heading` (card/post titles), `subheading` (bold UI),
   `body` (default), `body-sm`, `label` (buttons/forms/tabs), `caption` (defaults to muted tone).
 - `tone`: `default | secondary | muted | faint | inverse | brand | on-brand | accent | danger`.
 - `size`: a type-scale step (`xs`…`3xl`) that replaces the variant's size — e.g.
-  `variant="body" size="md"` for 15px dense body, `variant="subheading" size="md"` for 15px
-  emphasis. Prefer this over a `text-*` class in `className`.
+  `variant="body" size="sm"` for a dense row. There is no 15px step. Prefer this over a
+  `text-*` class in `className`.
 - Non-selectable by default (UI chrome must not highlight on click); pass `selectable` on user
   content — post bodies, comments, bios, descriptions.
 - Title/heading variants apply negative tracking; a caller `tracking-*` class replaces it.
 - Overrides are safe: when `className` sets a font (`font-*`), a size (`text-sm`, `text-[15px]`…),
-  a color (`text-brand`…), or tracking, the variant/tone class for that group is dropped, so the
-  caller's class always wins regardless of stylesheet order.
+  a color (`text-brand`…, including `text-rarity-*`, `text-rank-*`, `text-heat-*`), or tracking,
+  the variant/tone class for that group is dropped, so the caller's class always wins regardless
+  of stylesheet order.
 
 ## Button
 `<Button title variant size icon loading disabled …PressableProps>`
 - `variant`: `primary` (green pill), `secondary` (white + border), `tonal` (green-subtle),
   `ghost`, `danger` (subtle red). `size`: `sm | md | lg` (heights 36/44/48).
 - `icon` takes a lucide icon component. Web gets hover states; all get pressed states.
+- `loading` swaps the label for a spinner visually only: the button keeps `title` as its
+  accessible name and reports `busy`, so assistive tech never hears an unnamed control.
 
 ## IconButton
-`<IconButton icon size tone variant …>` — 40px round hit target. `variant`: `default`
+`<IconButton icon accessibilityLabel size tone variant …>` — 40px round hit target.
+`accessibilityLabel` is **required**: the glyph is the only content, so the label is the
+button's whole name to a screen reader ("Back", "Search", "Close"). `variant`: `default`
 (transparent, hover/press wash) or `primary` (brand fill + on-brand icon, e.g. a send
 button). Disabled state dims to 40% like Button.
 
 ## Card
 `<Card padded onPress className>` — white, `rounded-xl`, hairline border, clips children
 (`overflow-hidden`) so full-bleed rows/images respect the corners. `onPress` makes it
-pressable with hover/press states. `padded` (default) = `p-5`.
+pressable with hover/press states and the `button` role; pass `accessibilityRole="link"`
+when the card navigates. `padded` (default) = `p-5`.
 
 ## Avatar
 `<Avatar name imageUrl size ImageComponent>` — sizes `xs`24 `sm`32 `md`40 `lg`64 `xl`96.
-Initials fallback uses a deterministic warm color duo from the name. Pass expo-image's
-`Image` as `ImageComponent` in the app for caching/transitions.
+Initials fallback uses a deterministic warm color duo from the name. Both forms are an
+`image` named after the person (the initials are never read letter by letter). Pass
+expo-image's `Image` as `ImageComponent` in the app for caching/transitions; it receives
+`accessibilityLabel` and must forward it.
 
 ## Chip
-`<Chip label selected onPress>` — pill tag; selected = brand fill. For tags and filters.
+`<Chip label selected onPress>` — pill tag; selected = brand fill plus a check glyph, so
+colour is never the only cue. Pressable chips report `selected` state and carry 8px hitSlop.
 
 ## CountBadge / Pill
-`<CountBadge count>` — red unread counter, caps at 99+, renders nothing at 0.
+`<CountBadge count>` — unread counter (`danger` fill, 6:1 with the label, 11px), caps at 99+,
+renders nothing at 0. Hidden from assistive tech: put the count in the label of the control
+it decorates ("Notifications, 3 unread").
 `<Pill label tone size>` — status pill. Status tones: `neutral | brand | accent | danger`.
 Rarity tones for earned badges: `common | uncommon | rare | legendary` — the grey → green →
 blue → gold ladder, identical to `BadgeMedal`'s, so a rarity never wears two colours. `size`: `sm` (default, 11px — inline metadata like "Pinned") or
-`md` (12px, roomier — standalone chips like profile badges). Badge rarity comes from the API;
+`md` (roomier padding — standalone chips like profile badges); both are 12px, the floor of the
+type scale. Badge rarity comes from the API;
 see `onli-server/docs/PROGRESSION.md`.
 
 ## Input
-`<Input label error helper multiline …TextInputProps>` — white field, `rounded-lg`, focus
-border on web, error/helper line below. `multiline` gives 120px min height, top-aligned.
+`<Input label error helper multiline …TextInputProps>` — white field, `rounded-lg`,
+`line-input` border, focus border on web, error/helper line below. `label` doubles as the
+accessible name (pass `accessibilityLabel` to override); `error` sets `aria-invalid` and is
+announced. `multiline` gives 120px min height, top-aligned.
 
 ## Divider, Skeleton
 `<Divider/>` — hairline. `<Skeleton className="h-4 w-40"/>` — pulsing placeholder block;
 `rounded-sm` by default, override with a radius class (`rounded-full` for avatar circles).
+The classes sit on a plain `View` wrapping the animated fill — NativeWind does not interop
+`Animated.View`, so a `className` there would be dropped.
 
 ## ListRow
-`<ListRow title subtitle left right chevron dense onPress>` — settings/notification style
-row. `dense` is the compact variant (rails, secondary lists): tighter padding, label-weight
-two-line title, caption subtitle, 16px chevron.
+`<ListRow title subtitle left right chevron dense onPress accessibilityRole>` —
+settings/notification style row. `dense` is the compact variant (rails, secondary lists):
+tighter padding, label-weight two-line title, caption subtitle, 16px chevron. With `onPress`
+the row is a `button`; pass `accessibilityRole="link"` when it navigates.
 
 ## Segmented
 `<Segmented options value onChange>` — pill switcher (e.g. Top/New) on a sunken track.
+Exposed as a `tablist` of `tab`s with the active one `selected`.
 
 ## EmptyState
 `<EmptyState icon title message action>` — centered; icon sits in a brand-subtle circle,
@@ -73,7 +93,8 @@ two-line title, caption subtitle, 16px chevron.
 
 ## ConfirmButton
 `<ConfirmButton label confirmLabel onConfirm small>` — two-tap destructive pattern (first tap
-arms for 3s, second fires). Works on web and native; no Alert.
+arms for 8s, second fires). Arming is announced and reported as `expanded`; `small` carries
+10px hitSlop so the target still reaches 44px. Works on web and native; no Alert.
 
 ## Icon
 `<Icon icon={Home} size tone strokeWidth fill>` — lucide wrapper wired to semantic colors
@@ -88,8 +109,21 @@ color: `brand` (subtle), `brand-faint`, `accent`, `danger`, `neutral`, `overlay`
 media). `children` (an emoji/character) replaces `icon`.
 
 ## SectionLabel
-`<SectionLabel className>` — the uppercase 12px muted section label (sidebar groups, rail
-headings, in-page sections). Carries no margins; spacing belongs to the layout around it.
+`<SectionLabel className>` — the 12px sentence-case muted section label (sidebar groups, rail
+headings, in-page sections), exposed as a level-2 heading (`accessibilityRole="header"`,
+`aria-level` 2 on web) so screen readers can jump between sections. Never uppercase. Carries
+no margins; spacing belongs to the layout around it.
+
+## FormError
+`<FormError message tone size className>` — a form's error or status line. Renders nothing
+while `message` is empty; when it appears it is a live region (`role="alert"` / `aria-live`
+on web and Android) and is announced on iOS via `announce()`. `tone="status"` for
+confirmations ("Copied", "Saved"). Use it for every inline error instead of a red `Text`.
+
+## announce, useReducedMotion (`@onli/ui`)
+`announce(message)` speaks a message on iOS VoiceOver (no-op elsewhere, where live regions
+do the job). `useReducedMotion()` reports the OS / browser reduce-motion setting and follows
+changes; `Skeleton` uses it, and any consumer animation should.
 
 ## Spinner
 `<Spinner size tone className>` — brand-colored ActivityIndicator (`large` by default) so
@@ -102,7 +136,10 @@ progress).
 ## Wordmark
 `<Wordmark size className>` — the "Onli." logo (brand-strong + accent period). Sizes:
 `sm` 22px (nav bars), `md` 24px (default, drawers), `xl` 44px (sign-in hero). The px
-metrics are the logo's identity and live only here — never hand-build the wordmark.
+metrics live in `src/wordmark.ts` (`wordmarkSizes`, also exported from `@onli/ui/wordmark`)
+and are the logo's identity. Web consumers get the same logo from the generated
+`@onli/ui/css/wordmark.css`: `<span class="wordmark wordmark-sm">Onli<span
+class="wordmark-dot">.</span></span>` — never hand-build the wordmark in either kit.
 
 ## Channel icons (`@onli/ui/channel-icons`)
 A vendored 36-icon subset of [Twemoji](https://github.com/jdecked/twemoji) v17.0.3, exported
@@ -132,7 +169,12 @@ Regenerate with `bun run fetch-icons`. **Graphics are CC-BY 4.0; attribution is 
 lives in `NOTICE.md`.**
 
 ## BadgeMedal
-`<BadgeMedal icon ruleType rarity earned size />` — a badge rendered as a struck medal.
+`<BadgeMedal icon ruleType rarity earned size accessibilityLabel />` — a badge rendered as a
+struck medal. Pass `accessibilityLabel` ("First post, uncommon badge") when the medal stands
+alone; omit it when the name is rendered beside it and the medal is hidden from assistive
+tech. `RankInsignia` follows the same rule. The accessibility props sit on a wrapping `View`,
+never on `SvgXml` (react-native-svg forwards unknown props to the DOM on web), and hiding is
+always `aria-hidden`, which RN maps to the iOS and Android props and web understands.
 
 **Two axes, not one. `shape` says what KIND of thing the member did; colour says how rare it
 is.** A wall of identical discs made every badge look like every other, which is the whole

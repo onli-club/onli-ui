@@ -17,6 +17,7 @@ const DUOS = [
 export type AvatarImageProps = {
   source: { uri: string };
   style: { width: number; height: number; borderRadius: number };
+  accessibilityLabel: string;
 };
 
 export function Avatar({
@@ -35,7 +36,11 @@ export function Avatar({
   if (imageUrl) {
     const Img = ImageComponent ?? Image;
     return (
-      <Img source={{ uri: imageUrl }} style={{ width: px, height: px, borderRadius: px / 2 }} />
+      <Img
+        source={{ uri: imageUrl }}
+        style={{ width: px, height: px, borderRadius: px / 2 }}
+        accessibilityLabel={name}
+      />
     );
   }
   const initials = name
@@ -46,12 +51,18 @@ export function Avatar({
   let hash = 0;
   for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) | 0;
   const duo = DUOS[Math.abs(hash) % DUOS.length];
+  // The initials are a picture of the name, not text to read letter by letter.
   return (
     <View
+      accessible
+      accessibilityRole="image"
+      accessibilityLabel={name}
       className="items-center justify-center"
       style={{ width: px, height: px, borderRadius: px / 2, backgroundColor: duo.bg }}
     >
       <RNText
+        // The initials are a picture of the name, not letters to read out.
+        aria-hidden
         style={{
           fontFamily: fontFamilies["body-bold"],
           fontSize: px * 0.36,

@@ -9,12 +9,14 @@
   "types": "src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./tokens": "./src/tokens/index.ts",
+    "./tokens": "./src/tokens/dist/index.mjs",
     "./fonts": "./src/fonts.ts",
     "./tailwind/preset": "./src/tailwind/preset.js",
     "./css/theme.css": "./src/css/theme.css",
     "./css/fonts-web.css": "./src/css/fonts-web.css",
     "./css/base.css": "./src/css/base.css",
+    "./css/wordmark.css": "./src/css/wordmark.css",
+    "./wordmark": "./src/wordmark.ts",
     "./channel-icons": "./src/channel-icons.ts",
     "./badge-icons": "./src/badge-icons.ts",
     "./badge-medal-svg": "./src/badge-medal-svg.ts",
@@ -32,18 +34,15 @@
   },
   "peerDependencies": {
     "@expo-google-fonts/geist": "*",
-    "expo-font": "*",
     "lucide-react-native": "*",
     "nativewind": "^4",
     "react": "*",
     "react-native": "*",
+    "react-native-reanimated": ">=3.6.2",
     "react-native-svg": "*"
   },
   "peerDependenciesMeta": {
     "@expo-google-fonts/geist": {
-      "optional": true
-    },
-    "expo-font": {
       "optional": true
     },
     "lucide-react-native": {
@@ -53,6 +52,9 @@
       "optional": true
     },
     "react-native": {
+      "optional": true
+    },
+    "react-native-reanimated": {
       "optional": true
     },
     "react-native-svg": {

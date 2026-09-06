@@ -1,5 +1,7 @@
+import { Check } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 import { cn } from "./cn";
+import { Icon } from "./icon";
 import { Text } from "./text";
 
 export function Chip({
@@ -14,7 +16,7 @@ export function Chip({
   className?: string;
 }) {
   const classes = cn(
-    "self-start rounded-full px-3 py-1.5 transition-colors",
+    "flex-row items-center gap-1 self-start rounded-full px-3 py-1.5 transition-colors",
     selected ? "bg-brand" : "bg-surface-sunken",
     onPress &&
       (selected
@@ -22,14 +24,26 @@ export function Chip({
         : "hover:bg-surface-sunken-hover active:bg-surface-sunken-press"),
     className,
   );
+  // Selection is shown by a glyph as well as the fill, so colour is never the only cue.
   const text = (
-    <Text variant="label" className="text-xs" tone={selected ? "on-brand" : "secondary"}>
-      {label}
-    </Text>
+    <>
+      {selected && onPress ? (
+        <Icon icon={Check} size={12} tone="on-brand" strokeWidth={2.4} />
+      ) : null}
+      <Text variant="label" className="text-xs" tone={selected ? "on-brand" : "secondary"}>
+        {label}
+      </Text>
+    </>
   );
   if (!onPress) return <View className={classes}>{text}</View>;
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} className={classes}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      hitSlop={8}
+      onPress={onPress}
+      className={classes}
+    >
       {text}
     </Pressable>
   );

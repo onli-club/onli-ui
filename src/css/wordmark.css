@@ -1,0 +1,25 @@
+/* GENERATED from src/tokens — edit tokens, then `bun run generate`. Web consumers only; @import after fonts-web.css.
+   <span class="wordmark wordmark-sm">Onli<span class="wordmark-dot">.</span></span> */
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-brand-strong);
+}
+.wordmark-dot {
+  color: var(--color-accent);
+}
+.wordmark-sm {
+  font-size: 22px;
+  line-height: 28px;
+  letter-spacing: -0.5px;
+}
+.wordmark-md {
+  font-size: 24px;
+  line-height: 30px;
+  letter-spacing: -0.6px;
+}
+.wordmark-xl {
+  font-size: 44px;
+  line-height: 52px;
+  letter-spacing: -1px;
+}

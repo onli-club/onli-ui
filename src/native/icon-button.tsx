@@ -24,8 +24,10 @@ export function IconButton({
   className,
   disabled,
   ...props
-}: Omit<PressableProps, "children"> & {
+}: Omit<PressableProps, "children" | "accessibilityLabel"> & {
   icon: LucideIcon;
+  /** Required: the glyph is the only visible content, so this is the button's whole name. */
+  accessibilityLabel: string;
   size?: number;
   tone?: SemanticColor;
   variant?: keyof typeof VARIANTS;

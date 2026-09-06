@@ -29,8 +29,9 @@ export const primitives = {
     900: "#20281F",
     700: "#232B26",
     500: "#57635C",
-    // 400 must stay ≥4.5:1 on white — it carries captions and metadata
-    400: "#6B776F",
+    // 400 must stay ≥4.5:1 on sunken (#F1EFEA), not just white — it carries captions,
+    // placeholders, inactive tabs and neutral pills on every surface (was #6B776F: 4.07 on sunken)
+    400: "#5D6961",
     300: "#A9B2AA",
   },
   amber: {
@@ -95,8 +96,11 @@ export const semantic = {
   "ink-inverse": primitives.sand[50],
 
   // borders
-  line: "#E8E5DC",
+  line: primitives.sand[300],
   "line-strong": primitives.sand[400],
+  // text-field boundary: ≥3:1 on white/paper (WCAG 1.4.11); line-strong stays for buttons,
+  // spinners and emphasis where a heavy border would be wrong
+  "line-input": "#858D85",
   focus: primitives.green[500],
 
   // brand
@@ -107,11 +111,12 @@ export const semantic = {
   "brand-faint": primitives.green[50],
   "on-brand": primitives.sand[50],
 
-  // activity heat ramp (contribution grid); level 0 uses surface-sunken
-  "heat-1": primitives.green[200],
-  "heat-2": primitives.green[400],
-  "heat-3": primitives.green[600],
-  "heat-4": primitives.green[800],
+  // activity heat ramp (contribution grid); level 0 uses surface-sunken. Starts at green-400
+  // so a one-action day is ≥3:1 against the white card (green-200 was 1.5:1, invisible)
+  "heat-1": primitives.green[400],
+  "heat-2": primitives.green[500],
+  "heat-3": primitives.green[700],
+  "heat-4": primitives.green[900],
 
   // accent (streaks, XP, highlights)
   accent: primitives.amber[500],
@@ -141,7 +146,8 @@ export const semantic = {
   "rarity-rare-ink": primitives.steel[600],
   "rarity-legendary-bg": primitives.amber[500],
   "rarity-legendary-line": primitives.amber[700],
-  "rarity-legendary-ink": primitives.sand[50],
+  // dark on gold, like an engraved medal: sand-50 on amber-500 was 2.3:1
+  "rarity-legendary-ink": primitives.ink[900],
 
   /**
    * Medal gradient stops. `-bg` stays the flat value the rarity Pill uses; these two are the

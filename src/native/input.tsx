@@ -1,6 +1,7 @@
 import { TextInput, type TextInputProps, View } from "react-native";
 import { semantic } from "../tokens/colors";
 import { cn } from "./cn";
+import { FormError } from "./form-error";
 import { Text } from "./text";
 
 export function Input({
@@ -9,6 +10,7 @@ export function Input({
   helper,
   className,
   multiline,
+  accessibilityLabel,
   ...props
 }: TextInputProps & { label?: string; error?: string; helper?: string; className?: string }) {
   return (
@@ -19,9 +21,11 @@ export function Input({
         </Text>
       ) : null}
       <TextInput
+        accessibilityLabel={accessibilityLabel ?? label}
+        aria-invalid={!!error}
         className={cn(
           "rounded-lg border bg-surface px-4 py-3 font-body text-base text-ink",
-          error ? "border-danger" : "border-line-strong focus:border-focus",
+          error ? "border-danger" : "border-line-input focus:border-focus",
           multiline && "min-h-[120px]",
         )}
         placeholderTextColor={semantic["ink-muted"]}
@@ -30,9 +34,7 @@ export function Input({
         {...props}
       />
       {error ? (
-        <Text variant="caption" tone="danger" className="mt-1">
-          {error}
-        </Text>
+        <FormError message={error} size="caption" className="mt-1" />
       ) : helper ? (
         <Text variant="caption" className="mt-1">
           {helper}

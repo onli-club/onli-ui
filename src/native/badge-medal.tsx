@@ -1,3 +1,4 @@
+import { View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { type BadgeRarity, badgeMedalSvg } from "../badge-medal-svg";
 
@@ -18,6 +19,7 @@ export function BadgeMedal({
   rarity,
   earned = true,
   size = 40,
+  accessibilityLabel,
 }: {
   /** Glyph name; an unknown or missing one falls back to a generic award glyph. */
   icon: string | null | undefined;
@@ -26,8 +28,20 @@ export function BadgeMedal({
   rarity: BadgeRarity;
   earned?: boolean;
   size?: number;
+  /**
+   * What the medal stands for ("First post, uncommon"). Omit when the badge's name is
+   * rendered as text beside it — the medal is then hidden from assistive tech, not read twice.
+   */
+  accessibilityLabel?: string;
 }) {
+  const a11y = accessibilityLabel
+    ? { accessible: true, accessibilityRole: "image" as const, accessibilityLabel }
+    : { "aria-hidden": true };
+  // The a11y props live on a View, never on SvgXml: on web react-native-svg forwards every
+  // prop to the raw <svg> element, and React rejects RN-only names there.
   return (
-    <SvgXml xml={badgeMedalSvg({ icon, ruleType, rarity, earned })} width={size} height={size} />
+    <View {...a11y} style={{ width: size, height: size }}>
+      <SvgXml xml={badgeMedalSvg({ icon, ruleType, rarity, earned })} width={size} height={size} />
+    </View>
   );
 }

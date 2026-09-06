@@ -5,6 +5,7 @@ export {
   shapeForRule,
 } from "./badge-medal-svg";
 export { fonts } from "./fonts";
+export { announce, useReducedMotion } from "./native/a11y";
 export { Avatar, type AvatarImageProps } from "./native/avatar";
 export { CountBadge, Pill, type PillTone } from "./native/badge";
 export { BadgeMedal } from "./native/badge-medal";
@@ -15,6 +16,7 @@ export { cn } from "./native/cn";
 export { ConfirmButton } from "./native/confirm-button";
 export { Divider } from "./native/divider";
 export { EmptyState } from "./native/empty-state";
+export { FormError } from "./native/form-error";
 export { Icon } from "./native/icon";
 export { IconButton } from "./native/icon-button";
 export { IconCircle } from "./native/icon-circle";
@@ -30,3 +32,4 @@ export { Text, type TextSize, type TextTone, type TextVariant } from "./native/t
 export { Wordmark } from "./native/wordmark";
 export { rankInsigniaSvg } from "./rank-insignia-svg";
 export * as tokens from "./tokens";
+export { type WordmarkSize, wordmarkSizes } from "./wordmark";

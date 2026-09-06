@@ -14,7 +14,9 @@
       "*.json",
       "!src/css/theme.css",
       "!src/css/fonts-web.css",
-      "!src/tailwind/preset.js"
+      "!src/css/wordmark.css",
+      "!src/tailwind/preset.js",
+      "!src/tokens/dist"
     ]
   },
   "formatter": {
@@ -26,7 +28,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "preset": "recommended"
     }
   },
   "javascript": {
@@ -36,7 +38,13 @@
   },
   "overrides": [
     {
-      "includes": ["src/tailwind/preset.js", "src/css/theme.css", "src/css/fonts-web.css"],
+      "includes": [
+        "src/tailwind/preset.js",
+        "src/tokens/dist/**",
+        "src/css/theme.css",
+        "src/css/fonts-web.css",
+        "src/css/wordmark.css"
+      ],
       "formatter": { "enabled": false },
       "linter": { "enabled": false }
     }

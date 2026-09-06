@@ -2,17 +2,21 @@ import { View } from "react-native";
 import { cn } from "./cn";
 import { Text } from "./text";
 
-/** Small count badge (unread counts). Caps display at 99+. */
+/**
+ * Small count badge (unread counts). Caps display at 99+. Hidden from assistive tech: the
+ * control it decorates carries the count in its own label ("Notifications, 3 unread").
+ */
 export function CountBadge({ count, className }: { count: number; className?: string }) {
   if (count <= 0) return null;
   return (
     <View
+      aria-hidden
       className={cn(
-        "h-[18px] min-w-[18px] items-center justify-center rounded-full bg-like px-1",
+        "min-h-[18px] min-w-[18px] items-center justify-center rounded-full bg-danger px-1",
         className,
       )}
     >
-      <Text variant="label" tone="inverse" className="text-[10px] leading-[13px]">
+      <Text variant="label" tone="inverse" className="text-[11px] leading-[14px]">
         {count > 99 ? "99+" : count}
       </Text>
     </View>
@@ -59,11 +63,7 @@ export function Pill({
         className,
       )}
     >
-      <Text
-        variant="label"
-        className={size === "sm" ? "text-[11px] leading-[15px]" : "text-xs"}
-        tone={text}
-      >
+      <Text variant="label" className="text-xs" tone={text}>
         {label}
       </Text>
     </View>

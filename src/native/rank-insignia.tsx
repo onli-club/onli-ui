@@ -1,3 +1,4 @@
+import { View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { rankInsigniaSvg } from "../rank-insignia-svg";
 
@@ -20,12 +21,24 @@ export function RankInsignia({
   rank,
   size = 24,
   muted = false,
+  accessibilityLabel,
 }: {
   rank: string | null | undefined;
   size?: number;
   muted?: boolean;
+  /** The rung's name. Omit when the name is rendered as text beside the emblem. */
+  accessibilityLabel?: string;
 }) {
   const xml = rankInsigniaSvg({ rank, muted });
   if (!xml) return null;
-  return <SvgXml xml={xml} width={size} height={size} />;
+  const a11y = accessibilityLabel
+    ? { accessible: true, accessibilityRole: "image" as const, accessibilityLabel }
+    : { "aria-hidden": true };
+  // The a11y props live on a View, never on SvgXml: on web react-native-svg forwards every
+  // prop to the raw <svg> element, and React rejects RN-only names there.
+  return (
+    <View {...a11y} style={{ width: size, height: size }}>
+      <SvgXml xml={xml} width={size} height={size} />
+    </View>
+  );
 }

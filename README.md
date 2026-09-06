@@ -10,8 +10,8 @@ library styled with NativeWind.
 
 ```
 bun install
-bun run generate   # regenerate preset.js, theme.css, base.css, and fonts-web.css from src/tokens
+bun run generate   # regenerate preset.js, theme.css, base.css, fonts-web.css, and tokens/dist from src/tokens
 bun run typecheck && bun run lint
 ```
 
-The React Native peer dependencies are declared optional so a web consumer (onli-admin, which only imports the CSS and icon maps) does not install them; onli-app declares them directly.
+The React Native peer dependencies (including `react-native-reanimated`, which NativeWind 4 requires at runtime for the components' `transition-*` classes) are declared optional so a web consumer (onli-admin, which only imports the CSS and icon maps) does not install them; onli-app declares them directly.

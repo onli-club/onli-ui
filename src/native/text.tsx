@@ -37,7 +37,6 @@ export type TextTone = keyof typeof TONES;
 const SIZES = {
   xs: "text-xs",
   sm: "text-sm",
-  md: "text-md",
   base: "text-base",
   lg: "text-lg",
   xl: "text-xl",
@@ -51,9 +50,10 @@ const DEFAULT_TONE: Partial<Record<TextVariant, TextTone>> = { caption: "muted" 
 
 // Tailwind resolves conflicting utilities by stylesheet order, not className order,
 // so a variant class is dropped whenever the caller's className overrides its group.
-const SIZE_OVERRIDE = /(^|\s)text-(xs|sm|md|base|lg|xl|2xl|3xl|\[)/;
+const SIZE_OVERRIDE = /(^|\s)text-(xs|sm|base|lg|xl|2xl|3xl|\[)/;
 const FONT_OVERRIDE = /(^|\s)font-/;
-const COLOR_OVERRIDE = /(^|\s)text-(ink|brand|on-brand|accent|danger|like|success)/;
+const COLOR_OVERRIDE =
+  /(^|\s)text-(ink|brand|on-brand|accent|danger|like|success|rarity-|rank-|heat-)/;
 const TRACK_OVERRIDE = /(^|\s)tracking-/;
 
 /**
@@ -67,11 +67,12 @@ export function Text({
   size,
   className,
   selectable = false,
+  maxFontSizeMultiplier,
   ...props
 }: Omit<TextProps, "selectable"> & {
   variant?: TextVariant;
   tone?: TextTone;
-  /** Type-scale step that replaces the variant's size (e.g. size="md" for 15px dense body). */
+  /** Type-scale step that replaces the variant's size (e.g. size="sm" for a dense row). */
   size?: TextSize;
   className?: string;
   selectable?: boolean;
@@ -80,6 +81,9 @@ export function Text({
   const cls = className ?? "";
   return (
     <RNText
+      // Chrome scales to 1.3× with the OS font size so fixed-height controls never clip;
+      // user content (selectable) wraps freely, so it may grow to 2×.
+      maxFontSizeMultiplier={maxFontSizeMultiplier ?? (selectable ? 2 : 1.3)}
       className={cn(
         selectable ? "select-text" : "select-none",
         !FONT_OVERRIDE.test(cls) && v.font,

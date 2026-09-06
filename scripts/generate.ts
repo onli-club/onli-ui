@@ -1,8 +1,9 @@
-import { writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { primitives, semantic } from "../src/tokens/colors";
 import { layout, radii, shadows } from "../src/tokens/shape";
 import { fontFamilies, fontSizes, fontWeights, webFontFamily } from "../src/tokens/typography";
+import { wordmarkSizes } from "../src/wordmark";
 
 const root = join(import.meta.dir, "..");
 const banner = "GENERATED from src/tokens — edit tokens, then `bun run generate`.";
@@ -117,6 +118,64 @@ ${webWeightRules}
 `;
 writeFileSync(join(root, "src/css/fonts-web.css"), fontsWebCss);
 
+// The wordmark for web consumers: same metrics as the RN `Wordmark`, so it is never hand-built.
+const wordmarkRules = Object.entries(wordmarkSizes)
+  .map(
+    ([name, m]) =>
+      `.wordmark-${name} {\n  font-size: ${m.fontSize}px;\n  line-height: ${m.lineHeight}px;\n  letter-spacing: ${m.letterSpacing}px;\n}`,
+  )
+  .join("\n");
+const wordmarkCss = `/* ${banner} Web consumers only; @import after fonts-web.css.
+   <span class="wordmark wordmark-sm">Onli<span class="wordmark-dot">.</span></span> */
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: ${fontWeights.display};
+  color: var(--color-brand-strong);
+}
+.wordmark-dot {
+  color: var(--color-accent);
+}
+${wordmarkRules}
+`;
+writeFileSync(join(root, "src/css/wordmark.css"), wordmarkCss);
+
+// Plain-JS tokens for consumers with no TypeScript loader in front of node_modules
+// (onli-server runs `node dist/index.js`). `./tokens` in package.json points here; the
+// `.d.ts` carries the same literal types `as const` gives the source.
+const literal = (v: unknown): string => {
+  if (Array.isArray(v)) return `readonly [${v.map(literal).join(", ")}]`;
+  if (v && typeof v === "object")
+    return `{ ${Object.entries(v)
+      .map(([k, x]) => `readonly ${JSON.stringify(k)}: ${literal(x)}`)
+      .join("; ")} }`;
+  return JSON.stringify(v);
+};
+const tokenExports = {
+  primitives,
+  semantic,
+  layout,
+  radii,
+  shadows,
+  fontFamilies,
+  fontWeights,
+  webFontFamily,
+  fontSizes,
+};
+const tokensDir = join(root, "src/tokens/dist");
+mkdirSync(tokensDir, { recursive: true });
+writeFileSync(
+  join(tokensDir, "index.mjs"),
+  `// ${banner}\n${Object.entries(tokenExports)
+    .map(([name, value]) => `export const ${name} = ${JSON.stringify(value, null, 2)};`)
+    .join("\n")}\n`,
+);
+writeFileSync(
+  join(tokensDir, "index.d.mts"),
+  `// ${banner}\n${Object.entries(tokenExports)
+    .map(([name, value]) => `export declare const ${name}: ${literal(value)};`)
+    .join("\n")}\nexport type SemanticColor = keyof typeof semantic;\n`,
+);
+
 console.log(
-  "wrote src/tailwind/preset.js, src/css/theme.css, src/css/base.css, and src/css/fonts-web.css",
+  "wrote src/tailwind/preset.js, src/css/theme.css, src/css/base.css, src/css/fonts-web.css, src/css/wordmark.css, and src/tokens/dist/",
 );

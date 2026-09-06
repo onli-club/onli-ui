@@ -11,11 +11,12 @@
   --color-surface-sunken-press: #D7D3C9;
   --color-ink: #232B26;
   --color-ink-secondary: #57635C;
-  --color-ink-muted: #6B776F;
+  --color-ink-muted: #5D6961;
   --color-ink-faint: #A9B2AA;
   --color-ink-inverse: #FDFCFA;
-  --color-line: #E8E5DC;
+  --color-line: #E8E5DE;
   --color-line-strong: #D7D3C9;
+  --color-line-input: #858D85;
   --color-focus: #3B7D62;
   --color-brand: #20614E;
   --color-brand-strong: #1A4F40;
@@ -23,10 +24,10 @@
   --color-brand-subtle: #DFEBE4;
   --color-brand-faint: #EFF5F1;
   --color-on-brand: #FDFCFA;
-  --color-heat-1: #BFD7CB;
-  --color-heat-2: #639A80;
-  --color-heat-3: #20614E;
-  --color-heat-4: #143D32;
+  --color-heat-1: #639A80;
+  --color-heat-2: #3B7D62;
+  --color-heat-3: #1A4F40;
+  --color-heat-4: #0E2B24;
   --color-accent: #DE9A3D;
   --color-accent-strong: #95601A;
   --color-accent-subtle: #FAEDD4;
@@ -37,7 +38,7 @@
   --color-success: #3B7D62;
   --color-rarity-common-bg: #F1EFEA;
   --color-rarity-common-line: #D7D3C9;
-  --color-rarity-common-ink: #6B776F;
+  --color-rarity-common-ink: #5D6961;
   --color-rarity-uncommon-bg: #DFEBE4;
   --color-rarity-uncommon-line: #95BAA8;
   --color-rarity-uncommon-ink: #20614E;
@@ -46,7 +47,7 @@
   --color-rarity-rare-ink: #2F6098;
   --color-rarity-legendary-bg: #DE9A3D;
   --color-rarity-legendary-line: #95601A;
-  --color-rarity-legendary-ink: #FDFCFA;
+  --color-rarity-legendary-ink: #20281F;
   --color-rarity-common-top: #FAF8F5;
   --color-rarity-common-bottom: #DFDBD1;
   --color-rarity-uncommon-top: #EFF8F2;
@@ -55,7 +56,7 @@
   --color-rarity-rare-bottom: #B9D2EE;
   --color-rarity-legendary-top: #F0B75F;
   --color-rarity-legendary-bottom: #B8781A;
-  --color-rank-beginner: #6B776F;
+  --color-rank-beginner: #5D6961;
   --color-rank-enthusiast: #B4763C;
   --color-rank-practitioner: #20614E;
   --color-rank-specialist: #2F6098;
@@ -91,7 +92,7 @@
   --color-sand-400: #D7D3C9;
   --color-sand-500: #B5B0A2;
   --color-ink-300: #A9B2AA;
-  --color-ink-400: #6B776F;
+  --color-ink-400: #5D6961;
   --color-ink-500: #57635C;
   --color-ink-700: #232B26;
   --color-ink-900: #20281F;
@@ -125,8 +126,6 @@
   --text-xs--line-height: 16px;
   --text-sm: 14px;
   --text-sm--line-height: 20px;
-  --text-md: 15px;
-  --text-md--line-height: 22px;
   --text-base: 16px;
   --text-base--line-height: 24px;
   --text-lg: 18px;

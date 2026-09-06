@@ -9,7 +9,7 @@ Token-first design system shared by `onli-app` (NativeWind 4 / Tailwind 3.4), `o
   use semantic Tailwind classes (`bg-surface`, `text-ink-secondary`, `border-line`,
   `bg-brand`…), never raw hex.
 - `src/tailwind/preset.js` + `src/css/theme.css` + `src/css/base.css` +
-  `src/css/fonts-web.css` — GENERATED. After editing tokens run `bun run generate` and
+  `src/css/fonts-web.css` + `src/css/wordmark.css` — GENERATED. After editing tokens run `bun run generate` and
   commit the outputs.
 - `src/native/` — React Native components (NativeWind classNames), shipped as TypeScript
   source; the consuming app's Metro/babel compiles them.
@@ -23,7 +23,9 @@ Token-first design system shared by `onli-app` (NativeWind 4 / Tailwind 3.4), `o
   on text — use `font-body-md`/`font-body-bold` (Android can't synthesize bold for custom fonts).
 - Light theme only for now, but keep everything semantic so dark mode is a token-map change.
 - No new runtime dependencies; anything a component needs must be a peerDependency the app
-  already has (react-native-svg, lucide-react-native, expo-font, the two font packages).
+  already has (react-native-svg, lucide-react-native, react-native-reanimated for NativeWind's
+  `transition-*` classes, @expo-google-fonts/geist). `expo-font` is the app's concern: the kit
+  only exports the font map.
 - Consumers install this repo from git (`"@onli/ui": "github:onli-club/onli-ui#main"`), so a
   change is only visible to them once it is pushed and they run `bun update @onli/ui`; onli-app's Metro
   serves the sibling checkout live for local work. Breaking API changes must be applied to
