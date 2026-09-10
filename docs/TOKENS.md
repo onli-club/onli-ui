@@ -37,9 +37,8 @@ sessions (light, low-glare, high contrast for a 30–45 audience).
 | `like` | `text-like` | Filled like/heart |
 | `success` | `text-success` | Confirmations |
 | `overlay` | `bg-overlay` | Scrims |
-| `rarity-{common,uncommon,rare,legendary}-{bg,line,ink}` | `bg-rarity-rare-bg` | Badge rarity. Grey → green → blue → gold. Legendary is the only FILLED tier (`-bg` is solid amber, `-ink` is near-white) |
-| `rarity-{tier}-{top,bottom}` | JS only | The medal's lit face gradient. `-bg` stays the flat value the rarity `Pill` uses; these two are read by `badgeMedalSvg` and never as classes. Kept close together on purpose — a wide ramp turns to mud at 28px |
-| `rank-{beginner…master}` | `text-rank-mentor` | One hue per rung of the standing ladder: stone, bronze, green, blue, violet, gold |
+| `rarity-{common,uncommon,rare,legendary}-{bg,line,ink}` | `bg-rarity-rare-bg` | Badge rarity, pewter → green → blue → gold: `-bg` the solid face, `-line` the darker rim, `-ink` the white glyph/label. Spent by the rarity `Pill` and by the FALLBACK medal a badge without artwork gets — a badge with artwork carries its own hue in `badge-art.ts` |
+| `rank-{beginner…master}` | `text-rank-mentor` | One hue per rung of the standing ladder: stone, bronze, green, blue, violet, gold. The shield fill behind each rung's drawing (`rank-art.ts` adds its own lighter/darker tints) |
 
 Primitive scales (`green`, `sand`, `ink`, `amber`, `clay`, `steel`, `violet`, `bronze`) exist
 for the rare case a semantic token genuinely doesn't fit (e.g. avatar duos) — prefer adding a
@@ -48,7 +47,7 @@ gamification ladders and have no other use; amber doubles as the gold.
 
 **Why gamification breaks the one-brand-colour rule.** Everywhere else, colour means brand or
 status. Rarity and rank are the exception on purpose: grey → green → blue → gold is a ladder
-players read without a legend, which is what the PRD's no-tooltip rule needs, and a
+players read without a legend, which is what the no-tooltip rule needs, and a
 brand-green-only ramp made adjacent tiers indistinguishable. Confine these tokens to badges
 and rank insignia; nothing else in the product should wear them.
 

@@ -1,47 +1,35 @@
-import { isRankKey, type RankKey, rankInsignia } from "./rank-insignia";
-import { semantic } from "./tokens/colors";
+import { isRankKey, rankArt, rankArtPalette } from "./rank-art";
 
 /**
- * A rank emblem, composed at runtime so it can carry the same struck treatment the badge
- * medals do — a lit face gradient plus one emboss overlay.
+ * A rank emblem as one SVG string: a shield filled in the rung's own colour, with the rung's
+ * drawing on top. The same construction as `badgeMedalSvg`, so a badge and an insignia sit
+ * in one row as the same kind of object — and the same reasons it is a string rather than a
+ * styled box (a CSS-painted fill can lag the tokens; this cannot).
  *
- * The generated geometry paints itself with `currentColor`, which is a single flat colour by
- * definition. Gradients therefore cannot live in the generated file: this module repaints the
- * body with gradient references instead, twice, once for the face and once for the overlay.
+ * The frame is a shield because that is the one silhouette the badge frames deliberately
+ * avoid (badge-medal-svg.ts): standing and badges must not be mistaken for each other, and
+ * a shield is what games put a rank in. Every rung wears the same shield, so what changes
+ * from rung to rung is the colour and the object, never the plaque.
  *
- * Gradients are `userSpaceOnUse`, never the default object bounding box. A wreath is a dozen
- * separate leaves, and per-element bounding boxes would light each leaf individually — the
- * whole mark has to share one light direction or it reads as noise.
+ * No `<defs>` and no `url(#…)`, ever: the emblem is inline SVG in a page that already holds
+ * many others, and the gradient version painted the mark ENTIRELY through such references,
+ * so it occupied its box and drew nothing on every screen (Himanshu, 2026-09-08).
+ *
+ * `muted` is a rung the member has not reached: the same drawing in the paper's greys, the
+ * way a locked badge is, which is what makes reaching it read as a gain.
  */
 
-/** Keyed by RankKey so a rung with artwork but no colour fails typecheck, not paints flat. */
-const TIER: Record<RankKey, { top: string; bottom: string }> = {
-  beginner: { top: semantic["rank-beginner-top"], bottom: semantic["rank-beginner-bottom"] },
-  enthusiast: {
-    top: semantic["rank-enthusiast-top"],
-    bottom: semantic["rank-enthusiast-bottom"],
-  },
-  practitioner: {
-    top: semantic["rank-practitioner-top"],
-    bottom: semantic["rank-practitioner-bottom"],
-  },
-  specialist: {
-    top: semantic["rank-specialist-top"],
-    bottom: semantic["rank-specialist-bottom"],
-  },
-  mentor: { top: semantic["rank-mentor-top"], bottom: semantic["rank-mentor-bottom"] },
-  master: { top: semantic["rank-master-top"], bottom: semantic["rank-master-bottom"] },
-};
-
-/** Repaint the generated body, whose fills and strokes are all `currentColor`. */
-function paint(body: string, ref: string): string {
-  return `<g fill="${ref}">${body.replaceAll("currentColor", ref)}</g>`;
-}
+/** Drawn in the same 48-unit box as the badges, so the two systems share one scale. */
+const BOX = 48;
 
 /**
- * `muted` is a rung the member has not reached: flat, drained of colour, and deliberately
- * NOT embossed — the struck look is part of what having reached a rung means.
+ * Flat top with rounded shoulders, sides that fall straight to just below the middle, then
+ * sweep to a point. 36 wide and 38 tall: a shield with a straight top reads larger than a
+ * circle of the same width, so it comes in a little from the badges' 40.
  */
+const SHIELD =
+  "M10 5H38Q42 5 42 9V22.5C42 31.8 34.6 39.2 24 43.4C13.4 39.2 6 31.8 6 22.5V9Q6 5 10 5Z";
+
 export function rankInsigniaSvg({
   rank,
   muted = false,
@@ -50,26 +38,10 @@ export function rankInsigniaSvg({
   muted?: boolean;
 }): string | undefined {
   if (!isRankKey(rank)) return undefined;
-  const body = rankInsignia[rank].replace(/^<svg[^>]*>/, "").replace("</svg>", "");
-  const open = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">';
-
-  if (muted) return `${open}${paint(body, semantic["ink-faint"])}</svg>`;
-
-  const t = TIER[rank];
-  const face = `rf-${rank}`;
-  const defs =
-    `<defs><linearGradient id="${face}" gradientUnits="userSpaceOnUse" ` +
-    `x1="4" y1="2.5" x2="20" y2="21.5">` +
-    `<stop offset="0" stop-color="${t.top}"/><stop offset="1" stop-color="${t.bottom}"/>` +
-    `</linearGradient>` +
-    `<linearGradient id="re" gradientUnits="userSpaceOnUse" x1="0" y1="2.5" x2="0" y2="21.5">` +
-    // Lighter than the medals'. A medal's overlay sits on a broad face; an emblem is thin
-    // forms spread across the box, so the same strength reads as two colours rather than one
-    // struck object — the sprout's low stem takes the dark end of BOTH gradients at once.
-    `<stop offset="0" stop-color="#FFFFFF" stop-opacity="0.3"/>` +
-    `<stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0"/>` +
-    `<stop offset="1" stop-color="#1A2019" stop-opacity="0.08"/>` +
-    `</linearGradient></defs>`;
-
-  return `${open}${defs}${paint(body, `url(#${face})`)}${paint(body, "url(#re)")}</svg>`;
+  const palette = rankArtPalette(rank, muted);
+  const art = rankArt(rank, palette);
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${BOX} ${BOX}">` +
+    `<path d="${SHIELD}" fill="${palette.bg}"/>${art}</svg>`
+  );
 }

@@ -1,3 +1,4 @@
+import { badgeArt, badgeArtPalette } from "./badge-art";
 import { badgeIcons, getBadgeIcon } from "./badge-icons";
 import { semantic } from "./tokens/colors";
 
@@ -146,117 +147,147 @@ const PATH: Record<BadgeShape, (r: number) => string> = {
   diamond,
 };
 
-type Tone = { top: string; bottom: string; edge: string; glyph: string };
+type Tone = { rim: string; face: string; glyph: string };
 
 /**
- * A lit face, a rim, and a specular gloss — all of them FILLED areas, never inset hairlines.
+ * A struck game medal: a SOLID face in the tier's colour, a darker rim around it, and the glyph
+ * cut in white on top. Pewter, green, blue, gold — the ladder players already read.
  *
- * The emboss is done with gradients rather than an SVG `<filter>`: react-native-svg's parser
- * maps `feDropShadow`/`feGaussianBlur`, but filter *rendering* is newer there and uneven
- * across platforms, while gradients are long-supported and rasterise identically in RN, on
- * the web and inside onli-admin's data-URI. Geometry also stays crisp at any size.
+ * Solid is the point. A light face with a coloured outline reads as washed out beside the
+ * badges this borrows from, and the first pass at fixing the gold tier went that way and made
+ * every tier weaker (Himanshu, 2026-09-08). The face carries the colour; the rim gives the
+ * object an edge on a white card; white keeps the glyph legible on all four.
  *
- * Two earlier attempts at interior detail failed at the sizes the medal is actually used at
- * (28-44px). A 0.9-unit hairline bevel is under a pixel there, so it rendered as a fuzzy
- * second outline; a filled inner medallion was crisp but swallowed the frame, leaving a ring
- * too thin for a rosette's scallops to read. Hence: no concentric bands. Depth comes from the
- * face gradient and the gloss, which cost no extra edges.
+ * No `<defs>` and no `url(#…)` anywhere — a hard rule, not a preference. The medal is drawn
+ * inline in the app (many svgs in one document), as a data-URI `<img>` in onli-admin, and
+ * natively on a phone. A gradient must be referenced by a document-wide id, and duplicate ids
+ * across inline svgs resolve to whichever definition the document saw first: that is how the
+ * gradient version rendered filled on one profile screen and hollow on another from the same
+ * component with the same props, and how the rank emblem drew nothing at all.
  */
 const TONES: Record<BadgeRarity, Tone> = {
   common: {
-    top: semantic["rarity-common-top"],
-    bottom: semantic["rarity-common-bottom"],
-    edge: semantic["rarity-common-line"],
+    rim: semantic["rarity-common-line"],
+    face: semantic["rarity-common-bg"],
     glyph: semantic["rarity-common-ink"],
   },
   uncommon: {
-    top: semantic["rarity-uncommon-top"],
-    bottom: semantic["rarity-uncommon-bottom"],
-    edge: semantic["rarity-uncommon-line"],
+    rim: semantic["rarity-uncommon-line"],
+    face: semantic["rarity-uncommon-bg"],
     glyph: semantic["rarity-uncommon-ink"],
   },
   rare: {
-    top: semantic["rarity-rare-top"],
-    bottom: semantic["rarity-rare-bottom"],
-    edge: semantic["rarity-rare-line"],
+    rim: semantic["rarity-rare-line"],
+    face: semantic["rarity-rare-bg"],
     glyph: semantic["rarity-rare-ink"],
   },
   legendary: {
-    top: semantic["rarity-legendary-top"],
-    bottom: semantic["rarity-legendary-bottom"],
-    edge: semantic["rarity-legendary-line"],
+    rim: semantic["rarity-legendary-line"],
+    face: semantic["rarity-legendary-bg"],
     glyph: semantic["rarity-legendary-ink"],
   },
 };
 
+/** Not yet earned: the same object struck in the paper's own greys, so it reads as a ghost. */
 const LOCKED: Tone = {
-  top: semantic["surface-sunken"],
-  bottom: semantic["surface-sunken"],
-  edge: semantic["line-strong"],
+  rim: semantic["line-strong"],
+  face: semantic["surface-sunken"],
   glyph: semantic["ink-faint"],
 };
 
+/**
+ * How much of the face a 24-unit glyph box may take, per shape. A circle and a rounded square
+ * hold a square almost as wide as the face; a rhombus holds far less, and a flat-top hexagon
+ * less than a circle — one shared size made the anchor and the flame touch their own rim.
+ * The stroke is scaled back up so every glyph keeps the same weight whatever its box.
+ */
+const GLYPH: Record<BadgeShape, number> = {
+  seal: 21,
+  squircle: 21,
+  rosette: 19,
+  hexagon: 19,
+  diamond: 16,
+};
+
 /** The glyph's own markup, lifted out of its 24-unit box and re-coloured. */
-function glyphLayer(icon: string | null | undefined, color: string): string {
+function glyphLayer(icon: string | null | undefined, color: string, shape: BadgeShape): string {
   const svg = getBadgeIcon(icon) ?? badgeIcons.award;
   const inner = svg.replace(/^<svg[^>]*>/, "").replace("</svg>", "");
-  const size = 20;
+  const size = GLYPH[shape];
   const k = size / 24;
   const off = C - size / 2;
   return (
     `<g transform="translate(${n(off)} ${n(off)}) scale(${n(k)})" fill="none" ` +
-    `stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">` +
-    `${inner}</g>`
+    `stroke="${color}" stroke-width="${n(2.0 / k)}" stroke-linecap="round" ` +
+    `stroke-linejoin="round">${inner}</g>`
   );
 }
 
+/** Outer edge of the frame, and the face inside it on a fallback medal. */
+const RIM = 20;
+const FACE = { normal: 17.4, legendary: 16.6 } as const;
+
 /**
- * A struck medal: the frame in the rarity's fill, a bevel line inset inside it, and the
- * glyph. Legendary alone gets an outer rim, so the rarest tier is the only one wearing extra
- * metal. A locked badge keeps its shape in a dashed outline — what a member is working toward
- * is recognisably what they will get.
+ * How far the artwork has to shrink to sit inside each frame, since every drawing is authored
+ * once against the 26-unit box a circle holds. A rhombus of half-diagonal 20 holds only a
+ * 20-unit square (|x| + |y| <= 20), which is why the calendar and the crown hung out of their
+ * corners on the first pass; a rosette's scallops cut in to about r17. The values sit slightly above the strict inscribed
+ * square, because almost no drawing fills its own corners — they are tuned by eye at 40px.
+ */
+const ART_FIT: Record<BadgeShape, number> = {
+  seal: 1,
+  squircle: 1,
+  hexagon: 0.96,
+  rosette: 0.92,
+  diamond: 0.82,
+};
+
+/**
+ * A badge.
+ *
+ * A badge in the seeded catalogue has its OWN DRAWING (`badge-art.ts`), keyed by `code`: the
+ * family frame filled in the badge's own colour, with the artwork on top. That is the badge
+ * members actually see.
+ *
+ * A badge staff create later has no drawing, and falls back to the struck medal this used to
+ * be for everyone — frame in the rarity's dark metal, solid face, lucide glyph in white. Both
+ * paths share the frame geometry, so a new badge sits in a row of drawn ones without looking
+ * like a different kind of object. Neither path emits `<defs>` or `url(#…)`.
  */
 export function badgeMedalSvg({
+  code,
   icon,
   ruleType,
   rarity,
   earned = true,
 }: {
+  /** The badge's permanent code; what its artwork is keyed by. */
+  code?: string | null;
   icon: string | null | undefined;
   ruleType: string | null | undefined;
   rarity: BadgeRarity;
   earned?: boolean;
 }): string {
-  const shape = PATH[shapeForRule(ruleType)];
+  const key = shapeForRule(ruleType);
+  const shape = PATH[key];
+  const open = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${BOX} ${BOX}">`;
+
+  const palette = badgeArtPalette(code, rarity, earned);
+  const art = badgeArt(code, palette);
+  if (art) {
+    const k = ART_FIT[key];
+    const fitted =
+      k === 1
+        ? art
+        : `<g transform="translate(${C} ${C}) scale(${k}) translate(-${C} -${C})">${art}</g>`;
+    return `${open}<path d="${shape(RIM)}" fill="${palette.bg}"/>${fitted}</svg>`;
+  }
+
   const t = earned ? TONES[rarity] : LOCKED;
-  const legendary = earned && rarity === "legendary";
-  const d = shape(19);
-  // Ids are keyed by tier, so two medals of the same rarity on one page share one identical
-  // definition rather than colliding on different ones.
-  const face = `of-${earned ? rarity : "locked"}`;
-
-  const defs =
-    `<defs><linearGradient id="${face}" x1="0.15" y1="0" x2="0.85" y2="1">` +
-    `<stop offset="0" stop-color="${t.top}"/><stop offset="1" stop-color="${t.bottom}"/>` +
-    `</linearGradient>` +
-    // One overlay does the whole emboss: specular highlight at the top, nothing through the
-    // middle, contact shadow at the bottom. Cheaper and crisper than a second ring of geometry.
-    `<linearGradient id="od" x1="0" y1="0" x2="0" y2="1">` +
-    `<stop offset="0" stop-color="#FFFFFF" stop-opacity="0.55"/>` +
-    `<stop offset="0.45" stop-color="#FFFFFF" stop-opacity="0"/>` +
-    `<stop offset="1" stop-color="#1A2019" stop-opacity="0.12"/>` +
-    `</linearGradient></defs>`;
-
-  const layers = [
-    `<path d="${d}" fill="url(#${face})" stroke="${t.edge}" stroke-width="${
-      legendary ? 2.4 : 2
-    }"${earned ? "" : ' stroke-dasharray="3 2.4"'} stroke-linejoin="round"/>`,
-    earned ? `<path d="${d}" fill="url(#od)"/>` : "",
-    glyphLayer(icon, t.glyph),
-  ];
-
+  const face = earned && rarity === "legendary" ? FACE.legendary : FACE.normal;
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${BOX} ${BOX}">` +
-    `${defs}${layers.join("")}</svg>`
+    `${open}<path d="${shape(RIM)}" fill="${t.rim}"/>` +
+    `<path d="${shape(face)}" fill="${t.face}"/>` +
+    `${glyphLayer(icon, t.glyph, key)}</svg>`
   );
 }

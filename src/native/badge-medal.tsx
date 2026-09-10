@@ -5,15 +5,14 @@ import { type BadgeRarity, badgeMedalSvg } from "../badge-medal-svg";
 export type { BadgeRarity, BadgeShape } from "../badge-medal-svg";
 
 /**
- * A badge as a struck medal: a frame whose SHAPE says what kind of thing the member did and
- * whose COLOUR says how rare it is, a bevel line inset inside it, and the badge's glyph.
- *
- * The whole thing is one SVG from `@onli/ui/badge-medal-svg`, shared with onli-admin — not a
- * bordered box painted by Tailwind classes. Two reasons: a medal that is only a disc plus an
- * icon makes every badge look like every other, and a CSS-painted disc renders with no fill
- * at all whenever the compiled stylesheet is behind the tokens.
+ * A badge. Every badge in the seeded catalogue has its OWN DRAWING, keyed by `code`; one staff
+ * create later falls back to a struck medal carrying its lucide glyph. Both come out of
+ * `@onli/ui/badge-medal-svg` as one SVG string, shared with onli-admin — not a bordered box
+ * painted by Tailwind classes, because a CSS-painted disc renders with no fill at all whenever
+ * the compiled stylesheet is behind the tokens.
  */
 export function BadgeMedal({
+  code,
   icon,
   ruleType,
   rarity,
@@ -21,7 +20,9 @@ export function BadgeMedal({
   size = 40,
   accessibilityLabel,
 }: {
-  /** Glyph name; an unknown or missing one falls back to a generic award glyph. */
+  /** The badge's permanent code, which its artwork is keyed by. */
+  code?: string | null;
+  /** Fallback glyph name, used only when the badge has no artwork. */
   icon: string | null | undefined;
   /** Drives the frame shape. An unknown rule type falls back to the seal. */
   ruleType: string | null | undefined;
@@ -41,7 +42,11 @@ export function BadgeMedal({
   // prop to the raw <svg> element, and React rejects RN-only names there.
   return (
     <View {...a11y} style={{ width: size, height: size }}>
-      <SvgXml xml={badgeMedalSvg({ icon, ruleType, rarity, earned })} width={size} height={size} />
+      <SvgXml
+        xml={badgeMedalSvg({ code, icon, ruleType, rarity, earned })}
+        width={size}
+        height={size}
+      />
     </View>
   );
 }

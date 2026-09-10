@@ -45,10 +45,12 @@ when the card navigates. `padded` (default) = `p-5`.
 
 ## Avatar
 `<Avatar name imageUrl size ImageComponent>` — sizes `xs`24 `sm`32 `md`40 `lg`64 `xl`96.
-Initials fallback uses a deterministic warm color duo from the name. Both forms are an
-`image` named after the person (the initials are never read letter by letter). Pass
-expo-image's `Image` as `ImageComponent` in the app for caching/transitions; it receives
-`accessibilityLabel` and must forward it.
+With no photo it falls back to one neutral person glyph (sunken disc, `ink-faint` figure),
+the same mark for every member: a placeholder should read as "no photo yet", not as an
+identity, and a feed of coloured monograms competes with the members who did upload one.
+Both forms are an `image` named after the person. Pass expo-image's `Image` as
+`ImageComponent` in the app for caching/transitions; it receives `accessibilityLabel` and
+must forward it.
 
 ## Chip
 `<Chip label selected onPress>` — pill tag; selected = brand fill plus a check glyph, so
@@ -169,85 +171,80 @@ Regenerate with `bun run fetch-icons`. **Graphics are CC-BY 4.0; attribution is 
 lives in `NOTICE.md`.**
 
 ## BadgeMedal
-`<BadgeMedal icon ruleType rarity earned size accessibilityLabel />` — a badge rendered as a
-struck medal. Pass `accessibilityLabel` ("First post, uncommon badge") when the medal stands
-alone; omit it when the name is rendered beside it and the medal is hidden from assistive
-tech. `RankInsignia` follows the same rule. The accessibility props sit on a wrapping `View`,
-never on `SvgXml` (react-native-svg forwards unknown props to the DOM on web), and hiding is
-always `aria-hidden`, which RN maps to the iOS and Android props and web understands.
+`<BadgeMedal code icon ruleType rarity earned size accessibilityLabel />` — a badge. Pass
+`accessibilityLabel` ("First post, uncommon badge") when it stands alone; omit it when the name
+is rendered beside it and the badge is hidden from assistive tech.
 
-**Two axes, not one. `shape` says what KIND of thing the member did; colour says how rare it
-is.** A wall of identical discs made every badge look like every other, which is the whole
-problem a badge set exists to solve. Shape is derived from `ruleType` — the catalogue's
-families already *are* the rule types, so a `shape` column would duplicate them and a badge
-staff add later would need an extra decision:
+**Two paths, one geometry.** A badge in the seeded catalogue has its OWN DRAWING in
+`@onli/ui/badge-art`, keyed by `code`: the family frame filled in the badge's own colour with
+the artwork on top. A badge staff create later has no drawing and falls back to a struck medal
+— frame in the rarity's dark metal, solid face, its lucide glyph in white. Both share the frame,
+so a new badge sits in a row of drawn ones without looking like a different kind of object.
 
-| Shape | Rule types | Reads as |
-|---|---|---|
-| hexagon | `channel_post_count` | craft, one per topic channel |
-| squircle | `post_count`, `comment_count`, `channels_posted` | volume |
-| rosette | `likes_received_posts`, `single_post_comments`, `single_comment_likes` | impact — other people rated it |
-| diamond | `streak_days` | consistency |
-| seal | `profile_completed`, `founding_member`, `staff`, `course_completed`, `manual`, anything unknown | identity |
+**Shape is the family**, from `ruleType`: hexagon = craft, squircle = volume, rosette = impact,
+diamond = consistency, seal = identity. Derived, never stored — the catalogue's families already
+ARE the rule types. The shapes avoid the shield and star that belong to the rank insignia.
 
-Shapes deliberately avoid the shield and star silhouettes — those belong to `RankInsignia`,
-and the two systems must not be mistaken for each other.
+**Colour is identity, not rarity** — one hue per badge, except legendary, which is always gold
+so the rarest tier still reads at a glance. Rarity survives as the word on the Progress screen
+and as `Pill`'s rarity tones. This replaced a four-colour rarity ladder: four colours across 24
+badges cannot look alive, which is what Discord's badges do and ours did not (Himanshu,
+2026-09-08).
 
-`icon` is a name from `@onli/ui/badge-icons` (an unknown or null one falls back to `award`),
-and comes from `badge.icon` in the API.
+**No `<defs>`, no `url(#…)`, anywhere — a hard rule, not a preference.** A badge is drawn inline
+in onli-app (many svgs in one document), as a data-URI `<img>` in onli-admin, and natively on a
+phone. A gradient must be referenced by a document-wide id, and duplicate ids across inline svgs
+resolve to whichever definition the document saw first — which is how an earlier gradient
+version rendered filled on the own-profile screen and hollow on the public one, from the same
+component with the same props. The rank insignia, painted entirely through such references, drew
+nothing at all.
 
-Rarity is the frame, not the glyph — scanning a wall of badges should show which ones are
-scarce before a single name is read. The ramp is the one games already taught everyone:
-**grey → green → blue → gold** (`rarity-*` tokens), because it is read without a legend, which
-the no-tooltip rule needs. Legendary is the only FILLED tier — a solid gold disc with a 2px
-darker-gold rim and a near-white glyph — so the rarest badges are the only ones carrying solid
-colour. `Pill`'s rarity tones use the same four values: one rarity must never wear two colours.
+`earned={false}` renders the same drawing in the paper's greys (`LOCKED_PALETTE`), so what a
+member is working toward is recognisably what they will get. The fallback medal greys the same
+way.
 
-Each medal is a **struck object**: the shape filled with a lit face gradient
-(`rarity-{tier}-top` → `-bottom`, angled so the light comes from the upper left), a rim stroke,
-and one overlay that does the whole emboss — a specular highlight across the top, nothing
-through the middle, a contact shadow at the bottom. That overlay is a single gradient-filled
-copy of the same path, so depth costs no extra edges.
+Default `size` 40, which is what both profile shelves use; 32 is the smallest in use (the admin
+table), and the art holds at 22.
 
-**The emboss is gradients, not an SVG `<filter>`.** react-native-svg's XML parser maps
-`feDropShadow` and `feGaussianBlur`, but filter *rendering* there is newer and uneven across
-platforms, while gradients are long-supported and rasterise identically in React Native, on the
-web, and inside onli-admin's data-URI. Geometry also stays crisp at any size, which a blur
-does not.
+## Badge art (`@onli/ui/badge-art`)
+One hand-authored drawing per badge code, plus `badgeArtPalette` (the badge's hue, gold when
+legendary, greys when locked) and `hasBadgeArt` (which onli-admin uses to tell staff their glyph
+pick is unused).
 
-`earned={false}` keeps the same shape in a dashed outline with a faint glyph and **no gradient
-or emboss** — an unearned badge should not look struck.
-
-**The whole medal is one SVG string** from `@onli/ui/badge-medal-svg`, shared with onli-admin
-— not a bordered box painted by Tailwind. That is deliberate: the first version's disc colour
-came from Tailwind classes, so medals rendered with no fill at all whenever the compiled CSS
-was behind the tokens. Nothing in the medal touches CSS now.
-
-Default `size` 40. Below ~24 the bevel line starts to crowd the glyph; 32 is the smallest
-size in use (the admin table).
+Rules for adding one, all learned by drawing the first set and looking at it at 40px:
+- **One bold subject.** The first Founding Member was a banner plus a pole plus a mound plus a
+  star; it turned to mush and is now a single pennant.
+- **Two or three flat fills.** `ink` carries the subject (white on every earned badge), `soft`
+  its interior detail, `deep` the one accent giving it an edge.
+- **Nothing thinner than ~2 units** — 1.7px at 40px, and anything under a pixel fuzzes.
+- **Author against the 26-unit box a circle holds** (11 to 37). `ART_FIT` in `badge-medal-svg`
+  shrinks the drawing per frame, because a rhombus of half-diagonal 20 holds only a 20-unit
+  square: the calendar and the crown hung out of their diamond corners until it did.
+- Take the palette as an argument; never hardcode a hex, or the badge cannot render locked.
 
 ## RankInsignia
 `<RankInsignia rank size muted />` — the emblem for a rung of the standing ladder, composed by
-`rankInsigniaSvg` in `@onli/ui/rank-insignia-svg`.
+`rankInsigniaSvg` in `@onli/ui/rank-insignia-svg`: a shield filled in the rung's own colour
+(`rank-{tier}`) carrying the rung's drawing from `@onli/ui/rank-art`. Built exactly the way
+`BadgeMedal` is — one SVG string, flat fills, no CSS — so a badge and an insignia in one row
+are the same kind of object.
 
 `rank` is the rung's **permanent key** (`beginner`, `enthusiast`, …), never its name:
 Admin → Levels can rename a rung, and a rename must not swap or orphan its mark. A rung with
 no artwork renders nothing, leaving the rank name standing on its own exactly as it did
 before insignia existed.
 
-**Struck like the badge medals**: a lit face gradient in the rung's own metal
-(`rank-{tier}-{top,bottom}`) plus one emboss overlay. One hue per tier is half of what makes a
-mark identifiable on its own. `muted` renders it flat and drained to `ink-faint` for a rung the
-member has not reached — deliberately *not* embossed, since the struck look is part of what
-having reached a rung means.
+`muted` is a rung the member has not reached: the same drawing in the paper's greys
+(`LOCKED_PALETTE`, shared with a locked badge), so arriving at one reads as a gain.
 
-The emboss is lighter than the medals'. A medal's overlay sits on one broad face; an emblem is
-thin forms spread across the box, so the same strength reads as two colours rather than one
-object — the sprout's low stem otherwise takes the dark end of both gradients at once.
+**No gradients here either**, for the reason above: the emblem is inline SVG in a page holding
+many others, and the gradient version painted the mark *entirely* through `url(#…)`, so it
+occupied its box and drew nothing on every screen it appeared on.
 
-Default `size` 24. **Do not size it below 18** — the top rungs carry laurel and crown detail
-and a 13px copy is a smudge. Bylines stay text-only for that reason. 18 is the size that sits
-level with a `SectionLabel`; 26 suits a ladder row and 44 a card.
+Default `size` 24. **Do not size it below 20** — the top rungs carry laurel and crown detail
+and a 13px copy is a smudge. Bylines stay text-only for that reason. 20 sits in the profile
+meta pill, 28 in a ladder row, 40 on a card beside the streak's flame circle. **It draws its
+own frame: never wrap it in an `IconCircle`.**
 
 ## Badge icons (`@onli/ui/badge-icons`)
 A curated 48-icon subset of [Lucide](https://lucide.dev), exported as `badgeIcons`
@@ -278,15 +275,18 @@ Gradient ids are keyed by rarity (`of-rare`) rather than made unique per instanc
 medals of one tier inlined into the same document then share one identical definition instead
 of colliding on different ones.
 
-## Rank insignia (`@onli/ui/rank-insignia`)
-Six original marks, exported as `rankInsignia` (rung key → inline SVG string), `rankKeys`,
-`isRankKey`, and `getRankInsignia` (look keys up through the getter, as for channel icons).
-`rankInsigniaSvg` returns `undefined` for a key that is not one of the six, and every key
-with artwork must also have a tier colour in `rank-insignia-svg.ts` — that map is typed by
-`RankKey`, so leaving one out is a typecheck error rather than a mark that silently paints flat.
+## Rank art (`@onli/ui/rank-art`)
+Six hand-authored drawings, one per rung, keyed by rung key: `rankArt(key, palette)`,
+`rankArtPalette(key, muted)`, `rankKeys`, `isRankKey`, and the `RankKey` type. The badge
+treatment applied to standing: a white subject on the rung's colour, with one lighter tint
+(`soft`) for a lit facet or the wreath and one darker (`deep`) for a shadow or band. The
+frame is a **shield** — the one silhouette the badge frames avoid, and what games put a rank
+in — the same for every rung, so what changes between rungs is the colour and the object.
 
-**Each rung is a different object**: sprout, chevron, shield, star, star in laurel, crowned
-laurel — paired with its own tier colour. The first pass made all six a laurel that only grew
+**Each rung is a different object**: sprout, arrow, bolt, star, star over a laurel cradle,
+crown — paired with its own tier colour. Ornament is spent carefully: a full wreath around
+the mentor star lost at 28px (ring and star fought for the same pixels), so the laurel sits
+under the star, and the master crown fills the shield on its own. The first pass made all six a laurel that only grew
 fuller, and neighbouring rungs were impossible to tell apart in isolation, which is the whole
 job of an insignia. Games escalate the object itself rather than its density, and so do these.
 The series reads as what standing means at each rung: you started, you are climbing, you can
@@ -296,19 +296,12 @@ be relied on, you are distinguished, others learn from you, you have mastered it
 ordinal in disguise, which is the thing `onli-server/docs/PROGRESSION.md` exists to keep off
 the screen.
 
-**Every coordinate is absolute — no element carries a `transform`.** A `userSpaceOnUse`
-gradient resolves against the user space in effect where it is referenced, so a rotated leaf
-would sample a rotated copy of the ramp and the sprout's stem and leaves would come out
-different colours. Marks are built twice: once to measure, then again with the fit baked into
-every point.
-
-**Every mark is measured and normalised at build time**, not hand-tuned: each primitive
-reports the points it occupies and the fit scales and centres the result into one optical
-square. Hand-tuned coordinates could not hold six different shapes to one size — the
-first attempt drifted from a 13-unit sprout to a 27-unit wreath that overflowed the viewBox
-and rendered clipped, with every mark on a different vertical centre, so any row containing
-them looked crooked. If you add a primitive, make it push its points **and** map them through
-`XF`, or the mark will drift again.
-
-Generated by `bun run build-rank-insignia` (then `bun run format`). Original artwork; no
-third-party licence applies.
+Drawing rules are the badge art's (above), checked at the sizes that ship — 20, 28, 40 —
+by rendering at 1× and upscaling the PNG: one bold subject, two or three flat fills, nothing
+under ~2 units, no `<defs>`, no `url(#…)`. `bg` comes from the `rank-*` token so the ladder's
+colour stays in one place; `soft` and `deep` are picked by eye per hue. The shield is 36
+wide at the top and narrows fast below y=30, so a subject sits a little above centre — top
+edge at y≈10-11, nothing wider than ±10 once below y=30 — and every element, shadow included,
+keeps at least 3.5 units from the outline. Check margins numerically against the shield's
+curve rather than by eye: the first arrow and crown shadows leaked through the lower edge
+and only a 96px render showed it.

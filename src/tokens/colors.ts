@@ -24,6 +24,8 @@ export const primitives = {
     300: "#E8E5DE",
     400: "#D7D3C9",
     500: "#B5B0A2",
+    // pewter: the common tier's solid face, dark enough to carry a white glyph
+    600: "#8A8578",
   },
   ink: {
     900: "#20281F",
@@ -40,6 +42,8 @@ export const primitives = {
     500: "#DE9A3D",
     600: "#B87B23",
     700: "#95601A",
+    // deep bronze: the gold tier's rim, which amber-700 was too close to the face to be
+    800: "#6F4712",
   },
   // gamification hues. The rarity ladder players already read is grey -> green -> blue ->
   // gold, so blue and violet exist purely to complete it; amber doubles as the gold.
@@ -132,37 +136,28 @@ export const semantic = {
 
   /**
    * Badge rarity. Deliberately NOT the brand ramp: rarity is read fastest in the colours
-   * games already taught everyone — grey, green, blue, gold — and a badge 90% of members
-   * hold must not share a hue with one 1% hold. Legendary is the only filled tier.
+   * games already taught everyone — pewter, green, blue, gold — and a badge 90% of members
+   * hold must not share a hue with one 1% hold.
+   *
+   * One triple per tier, and the medal and the Pill spend it the same way: `-bg` is the SOLID
+   * face, `-line` the darker rim around it, `-ink` the glyph and the label sitting on that
+   * face. Solid, not tinted: an outlined medal on a light face reads as washed out next to the
+   * game badges this ladder borrows from (Himanshu, 2026-09-08). Every face is therefore dark
+   * enough to carry a white glyph at 3:1 or better — that constraint, not brightness, is what
+   * picks each value.
    */
-  "rarity-common-bg": primitives.sand[200],
-  "rarity-common-line": primitives.sand[400],
-  "rarity-common-ink": primitives.ink[400],
-  "rarity-uncommon-bg": primitives.green[100],
-  "rarity-uncommon-line": primitives.green[300],
-  "rarity-uncommon-ink": primitives.green[600],
-  "rarity-rare-bg": primitives.steel[100],
-  "rarity-rare-line": primitives.steel[300],
-  "rarity-rare-ink": primitives.steel[600],
-  "rarity-legendary-bg": primitives.amber[500],
-  "rarity-legendary-line": primitives.amber[700],
-  // dark on gold, like an engraved medal: sand-50 on amber-500 was 2.3:1
-  "rarity-legendary-ink": primitives.ink[900],
-
-  /**
-   * Medal gradient stops. `-bg` stays the flat value the rarity Pill uses; these two are the
-   * lit top and the shaded bottom of the struck face, so a medal reads as an object with a
-   * light source rather than a coloured chip. Kept deliberately close together — a wide ramp
-   * turns to mud at the 28px the medal is smallest at.
-   */
-  "rarity-common-top": "#FAF8F5",
-  "rarity-common-bottom": "#DFDBD1",
-  "rarity-uncommon-top": "#EFF8F2",
-  "rarity-uncommon-bottom": "#B9D4C6",
-  "rarity-rare-top": "#F1F6FD",
-  "rarity-rare-bottom": "#B9D2EE",
-  "rarity-legendary-top": "#F0B75F",
-  "rarity-legendary-bottom": "#B8781A",
+  "rarity-common-bg": primitives.sand[600],
+  "rarity-common-line": primitives.ink[400],
+  "rarity-common-ink": primitives.sand[50],
+  "rarity-uncommon-bg": primitives.green[500],
+  "rarity-uncommon-line": primitives.green[700],
+  "rarity-uncommon-ink": primitives.sand[50],
+  "rarity-rare-bg": primitives.steel[500],
+  "rarity-rare-line": primitives.steel[700],
+  "rarity-rare-ink": primitives.sand[50],
+  "rarity-legendary-bg": primitives.amber[600],
+  "rarity-legendary-line": primitives.amber[800],
+  "rarity-legendary-ink": primitives.sand[50],
 
   /**
    * Rank tiers, one hue per rung, so an insignia is identifiable on its own rather than only
@@ -176,24 +171,6 @@ export const semantic = {
   "rank-specialist": primitives.steel[600],
   "rank-mentor": primitives.violet[500],
   "rank-master": primitives.amber[600],
-
-  /**
-   * Rank emblem gradient stops, same job as `rarity-*-{top,bottom}`: the lit top and shaded
-   * bottom of a struck mark. The flat `rank-*` value above stays the base the pair is built
-   * around, and is what a future flat use would take.
-   */
-  "rank-beginner-top": "#7C8781",
-  "rank-beginner-bottom": "#646F68",
-  "rank-enthusiast-top": "#C08349",
-  "rank-enthusiast-bottom": "#9C6733",
-  "rank-practitioner-top": "#2E7A62",
-  "rank-practitioner-bottom": primitives.green[700],
-  "rank-specialist-top": "#4179B5",
-  "rank-specialist-bottom": primitives.steel[700],
-  "rank-mentor-top": "#9270C9",
-  "rank-mentor-bottom": primitives.violet[600],
-  "rank-master-top": "#D49A3A",
-  "rank-master-bottom": primitives.amber[700],
 
   overlay: "rgba(32, 40, 31, 0.45)",
 } as const;

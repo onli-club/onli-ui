@@ -1,24 +1,33 @@
 import type { ComponentType } from "react";
-import { Image, Text as RNText, View } from "react-native";
-import { primitives } from "../tokens/colors";
-import { fontFamilies } from "../tokens/typography";
+import { Image, View } from "react-native";
+import Svg, { Circle, Path } from "react-native-svg";
+import { semantic } from "../tokens/colors";
 
 const SIZES = { xs: 24, sm: 32, md: 40, lg: 64, xl: 96 } as const;
-
-/** Deterministic warm duos for initials fallbacks. */
-const DUOS = [
-  { bg: primitives.green[100], fg: primitives.green[700] },
-  { bg: primitives.amber[100], fg: primitives.amber[700] },
-  { bg: primitives.clay[100], fg: primitives.clay[600] },
-  { bg: primitives.sand[300], fg: primitives.ink[500] },
-  { bg: primitives.green[200], fg: primitives.green[800] },
-] as const;
 
 export type AvatarImageProps = {
   source: { uri: string };
   style: { width: number; height: number; borderRadius: number };
   accessibilityLabel: string;
 };
+
+/**
+ * A member with no photo yet. One mark for everyone rather than initials or a generated
+ * pattern: a placeholder should read as "no photo", not as an identity, and a feed of
+ * coloured monograms competes with the members who did upload one.
+ *
+ * Drawn with primitives rather than an icon font so it scales cleanly from the 24px byline
+ * to the 96px profile, and the geometry is proportional to the box.
+ */
+function PersonGlyph({ size }: { size: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Circle cx={12} cy={12} r={12} fill={semantic["surface-sunken"]} />
+      <Circle cx={12} cy={9.4} r={3.4} fill={semantic["ink-faint"]} />
+      <Path d="M6.4 19a5.6 5.6 0 0 1 11.2 0Z" fill={semantic["ink-faint"]} />
+    </Svg>
+  );
+}
 
 export function Avatar({
   name,
@@ -43,35 +52,11 @@ export function Avatar({
       />
     );
   }
-  const initials = name
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase() ?? "")
-    .join("");
-  let hash = 0;
-  for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) | 0;
-  const duo = DUOS[Math.abs(hash) % DUOS.length];
-  // The initials are a picture of the name, not text to read letter by letter.
+  // The a11y props live on the View, never on Svg: on web react-native-svg forwards every
+  // prop to the raw <svg> element, and React rejects RN-only names there.
   return (
-    <View
-      accessible
-      accessibilityRole="image"
-      accessibilityLabel={name}
-      className="items-center justify-center"
-      style={{ width: px, height: px, borderRadius: px / 2, backgroundColor: duo.bg }}
-    >
-      <RNText
-        // The initials are a picture of the name, not letters to read out.
-        aria-hidden
-        style={{
-          fontFamily: fontFamilies["body-bold"],
-          fontSize: px * 0.36,
-          color: duo.fg,
-          userSelect: "none",
-        }}
-      >
-        {initials || "?"}
-      </RNText>
+    <View accessible accessibilityRole="image" accessibilityLabel={name}>
+      <PersonGlyph size={px} />
     </View>
   );
 }
