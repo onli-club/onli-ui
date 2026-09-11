@@ -25,7 +25,8 @@ export function Card({
       onPress={onPress}
       className={cn(
         classes,
-        "transition-colors hover:border-line-strong active:bg-surface-solid-press",
+        // 0.99, not the controls' 0.97: a 760px-wide card at 0.97 shifts its edge 23px
+        "transition duration-press ease-out hover:border-line-strong active:bg-surface-solid-press active:scale-[0.99]",
       )}
       {...props}
     >

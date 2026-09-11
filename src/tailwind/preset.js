@@ -186,6 +186,19 @@ module.exports = {
       "width": {
         "sidebar": "264px",
         "rail": "300px"
+      },
+      "transitionDuration": {
+        "press": "120ms",
+        "fast": "160ms",
+        "base": "200ms",
+        "screen": "240ms",
+        "drawer": "260ms"
+      },
+      "transitionTimingFunction": {
+        "DEFAULT": "cubic-bezier(0.23, 1, 0.32, 1)",
+        "out": "cubic-bezier(0.23, 1, 0.32, 1)",
+        "in-out": "cubic-bezier(0.77, 0, 0.175, 1)",
+        "drawer": "cubic-bezier(0.32, 0.72, 0, 1)"
       }
     }
   }

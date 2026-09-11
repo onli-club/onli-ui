@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { primitives, semantic } from "../src/tokens/colors";
+import { cssEasing, motion } from "../src/tokens/motion";
 import { layout, radii, shadows } from "../src/tokens/shape";
 import { fontFamilies, fontSizes, fontWeights, webFontFamily } from "../src/tokens/typography";
 import { wordmarkSizes } from "../src/wordmark";
@@ -28,6 +29,16 @@ const preset = {
       maxWidth: Object.fromEntries(Object.entries(layout).map(([k, v]) => [k, `${v}px`])),
       // fixed shell columns (w-sidebar / w-rail); content columns stay max-widths
       width: { sidebar: `${layout.sidebar}px`, rail: `${layout.rail}px` },
+      transitionDuration: Object.fromEntries(
+        Object.entries(motion.duration).map(([k, v]) => [k, `${v}ms`]),
+      ),
+      // DEFAULT is what the bare `transition` utility uses
+      transitionTimingFunction: {
+        DEFAULT: cssEasing(motion.curve.out),
+        out: cssEasing(motion.curve.out),
+        "in-out": cssEasing(motion.curve.inOut),
+        drawer: cssEasing(motion.curve.drawer),
+      },
     },
   },
 };
@@ -156,6 +167,7 @@ const tokenExports = {
   layout,
   radii,
   shadows,
+  motion,
   fontFamilies,
   fontWeights,
   webFontFamily,

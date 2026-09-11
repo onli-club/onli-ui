@@ -4,6 +4,7 @@ export declare const semantic: { readonly "paper": "#F8F7F4"; readonly "surface"
 export declare const layout: { readonly "reading": 760; readonly "modal": 440; readonly "sidebar": 264; readonly "rail": 300; readonly "shell": 1384 };
 export declare const radii: { readonly "sm": 8; readonly "md": 10; readonly "lg": 12; readonly "xl": 16; readonly "2xl": 20; readonly "3xl": 28 };
 export declare const shadows: { readonly "card": "0 1px 2px rgba(32, 40, 31, 0.05), 0 4px 16px rgba(32, 40, 31, 0.05)"; readonly "pop": "0 4px 12px rgba(32, 40, 31, 0.10), 0 12px 32px rgba(32, 40, 31, 0.10)" };
+export declare const motion: { readonly "duration": { readonly "press": 120; readonly "fast": 160; readonly "base": 200; readonly "screen": 240; readonly "drawer": 260 }; readonly "curve": { readonly "out": readonly [0.23, 1, 0.32, 1]; readonly "inOut": readonly [0.77, 0, 0.175, 1]; readonly "drawer": readonly [0.32, 0.72, 0, 1] } };
 export declare const fontFamilies: { readonly "display": "Geist_700Bold"; readonly "body": "Geist_400Regular"; readonly "body-md": "Geist_500Medium"; readonly "body-bold": "Geist_600SemiBold" };
 export declare const fontWeights: { readonly "display": 700; readonly "body": 400; readonly "body-md": 500; readonly "body-bold": 600 };
 export declare const webFontFamily: "Geist";

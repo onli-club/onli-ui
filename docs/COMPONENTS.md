@@ -29,19 +29,25 @@ and 2× for `selectable` user content (`maxFontSizeMultiplier` overrides). Contr
 - `icon` takes a lucide icon component. Web gets hover states; all get pressed states.
 - `loading` swaps the label for a spinner visually only: the button keeps `title` as its
   accessible name and reports `busy`, so assistive tech never hears an unnamed control.
+- Pressing dips the whole button to 97% over `duration-press` alongside the colour change.
+- A `title` that changes on a mounted button (Join → Leave) crossfades instead of snapping:
+  the icon and label sit in a reanimated view that dips to 40% and comes back. Never on mount,
+  and skipped under `useReducedMotion()`. That view carries the icon/label gap as a number —
+  NativeWind drops a `className` on an animated view, so the gap cannot be a class.
 
 ## IconButton
 `<IconButton icon accessibilityLabel size tone variant …>` — 40px round hit target.
 `accessibilityLabel` is **required**: the glyph is the only content, so the label is the
 button's whole name to a screen reader ("Back", "Search", "Close"). `variant`: `default`
 (transparent, hover/press wash) or `primary` (brand fill + on-brand icon, e.g. a send
-button). Disabled state dims to 40% like Button.
+button). Disabled state dims to 40% like Button, and pressing dips it to 97% like Button.
 
 ## Card
 `<Card padded onPress className>` — white, `rounded-xl`, hairline border, clips children
 (`overflow-hidden`) so full-bleed rows/images respect the corners. `onPress` makes it
 pressable with hover/press states and the `button` role; pass `accessibilityRole="link"`
-when the card navigates. `padded` (default) = `p-5`.
+when the card navigates. `padded` (default) = `p-5`. A pressed card dips to 99%, not the
+controls' 97%: a card is up to 760px wide and 97% would slide its edge 23px.
 
 ## Avatar
 `<Avatar name imageUrl size ImageComponent>` — sizes `xs`24 `sm`32 `md`40 `lg`64 `xl`96.
@@ -77,7 +83,9 @@ announced. `multiline` gives 120px min height, top-aligned.
 `<Divider/>` — hairline. `<Skeleton className="h-4 w-40"/>` — pulsing placeholder block;
 `rounded-sm` by default, override with a radius class (`rounded-full` for avatar circles).
 The classes sit on a plain `View` wrapping the animated fill — NativeWind does not interop
-`Animated.View`, so a `className` there would be dropped.
+reanimated's `Animated.View`, so a `className` there would be dropped. The pulse is a
+reanimated loop (700ms each way, `ease-in-out`): a loading indicator, so it is exempt from
+the token durations. Reduced motion holds it at a flat 0.75 opacity.
 
 ## ListRow
 `<ListRow title subtitle left right chevron dense onPress accessibilityRole>` —
@@ -88,6 +96,18 @@ the row is a `button`; pass `accessibilityRole="link"` when it navigates.
 ## Segmented
 `<Segmented options value onChange>` — pill switcher (e.g. Top/New) on a sunken track.
 Exposed as a `tablist` of `tab`s with the active one `selected`.
+
+One white pill **slides** between the options rather than each option re-colouring: a single
+reanimated view under the labels, animated to the active option's measured x and width over
+`duration-base` on `ease-in-out`. Each option reports its box through `onLayout`; the pill is
+invisible until the first measurement (so it never flashes at x=0), is placed without
+animation that first time, and jumps straight to the new option under `useReducedMotion()`.
+Only the labels change colour on their own (`default` ↔ `muted`).
+
+The padding lives on an outer view and the options on an inner one with none. Yoga positions
+an absolute child from its parent's *border* edge while the web positions it from the *padding*
+edge, so a padded parent would put the pill 4px off on one of the two platforms; with no
+padding between them, the pill and the measured x share one origin everywhere.
 
 ## EmptyState
 `<EmptyState icon title message action>` — centered; icon sits in a brand-subtle circle,
@@ -125,7 +145,10 @@ confirmations ("Copied", "Saved"). Use it for every inline error instead of a re
 ## announce, useReducedMotion (`@onli/ui`)
 `announce(message)` speaks a message on iOS VoiceOver (no-op elsewhere, where live regions
 do the job). `useReducedMotion()` reports the OS / browser reduce-motion setting and follows
-changes; `Skeleton` uses it, and any consumer animation should.
+changes; `Skeleton`, `Segmented` and `Button` use it, and any consumer animation should. What
+it turns off is the travel, never the end state: the segmented pill still lands on the active
+option, the button label still changes — they just stop moving to get there. Durations and
+curves come from `tokens.motion` (`docs/TOKENS.md`).
 
 ## Spinner
 `<Spinner size tone className>` — brand-colored ActivityIndicator (`large` by default) so

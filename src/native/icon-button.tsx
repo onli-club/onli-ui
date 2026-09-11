@@ -40,7 +40,7 @@ export function IconButton({
       hitSlop={6}
       disabled={disabled}
       className={cn(
-        "h-10 w-10 items-center justify-center rounded-full transition-colors",
+        "h-10 w-10 items-center justify-center rounded-full transition duration-press ease-out active:scale-[0.97]",
         v.box,
         disabled && "opacity-40",
         className,

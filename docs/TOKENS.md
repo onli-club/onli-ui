@@ -82,6 +82,41 @@ Prefer the `Text` component's `variant` (and `size` prop for scale steps) over r
   top bar caps its content at the same width so it sits on that axis). Breakpoint for the
   desktop shell: `lg` (1024px).
 
+## Motion
+
+Source: `src/tokens/motion.ts` (`tokens.motion`, also in `@onli/ui/tokens`). The preset turns
+the durations into `duration-*` classes and the curves into the `ease-*` ones, so a component
+never writes a millisecond or a bezier inline; reanimated code takes the same numbers from the
+module (`Easing.bezier(...motion.curve.out)`).
+
+| Class / token | ms | For |
+|---|---|---|
+| `duration-press` | 120 | Press feedback — the scale dip and colour change under a finger |
+| `duration-fast` | 160 | Something settling in place: a label colour, the end of a crossfade |
+| `duration-base` | 200 | The default for anything that travels (the segmented indicator) |
+| `duration-screen` | 240 | Screen-to-screen transitions |
+| `duration-drawer` | 260 | Drawers and sheets |
+
+| Class | Curve | For |
+|---|---|---|
+| `ease-out` | `0.23, 1, 0.32, 1` | Entrances and feedback. Also what the bare `transition` utility uses (`transitionTimingFunction.DEFAULT`) |
+| `ease-in-out` | `0.77, 0, 0.175, 1` | Movement from one place on screen to another |
+| `ease-drawer` | `0.32, 0.72, 0, 1` | Sheets and drawers |
+
+**Animate transform and opacity only, never `ease-in`, nothing over 300ms.** Width, height,
+padding and colour changes cost a layout pass on every frame — the one deliberate exception is
+the segmented indicator, which animates its width because the options have different labels.
+`ease-in` starts slow and ends fast, which reads as the interface hesitating; entrances and
+feedback are `ease-out`, movement is `ease-in-out`. Anything longer than the drawer is
+something the person is waiting on rather than watching.
+
+Every animation is gated on `useReducedMotion()` (see `docs/COMPONENTS.md`): the end state
+still applies, it just arrives without the travel.
+
+The `duration-*` and `ease-*` classes are preset (Tailwind 3 / NativeWind) vocabulary. Tailwind 4
+consumers keep Tailwind's own easings for now and should read `motion` from `@onli/ui/tokens`
+when they need these values.
+
 ## Consuming
 
 - **onli-app** (Tailwind 3 / NativeWind): `presets: [require("@onli/ui/tailwind/preset")]`

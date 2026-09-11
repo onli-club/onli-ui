@@ -138,6 +138,35 @@ export const shadows = {
   "card": "0 1px 2px rgba(32, 40, 31, 0.05), 0 4px 16px rgba(32, 40, 31, 0.05)",
   "pop": "0 4px 12px rgba(32, 40, 31, 0.10), 0 12px 32px rgba(32, 40, 31, 0.10)"
 };
+export const motion = {
+  "duration": {
+    "press": 120,
+    "fast": 160,
+    "base": 200,
+    "screen": 240,
+    "drawer": 260
+  },
+  "curve": {
+    "out": [
+      0.23,
+      1,
+      0.32,
+      1
+    ],
+    "inOut": [
+      0.77,
+      0,
+      0.175,
+      1
+    ],
+    "drawer": [
+      0.32,
+      0.72,
+      0,
+      1
+    ]
+  }
+};
 export const fontFamilies = {
   "display": "Geist_700Bold",
   "body": "Geist_400Regular",
