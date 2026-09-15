@@ -1,17 +1,12 @@
-import { useEffect, useRef, useState } from "react";
-import { type LayoutChangeEvent, Pressable, View } from "react-native";
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import { useEffect, useState } from "react";
+import { type LayoutChangeEvent, Pressable, View, type ViewStyle } from "react-native";
+import Animated, { type CSSStyle, cubicBezier } from "react-native-reanimated";
 import { motion, semantic, shadows } from "../tokens";
 import { useReducedMotion } from "./a11y";
 import { cn } from "./cn";
 import { Text } from "./text";
 
-const EASE_IN_OUT = Easing.bezier(...motion.curve.inOut);
+const EASE_IN_OUT = cubicBezier(...motion.curve.inOut);
 
 const INDICATOR = {
   position: "absolute",
@@ -43,31 +38,27 @@ export function Segmented<T extends string>({
 }) {
   const reduced = useReducedMotion();
   const [rects, setRects] = useState<Record<string, { x: number; width: number }>>({});
-  const x = useSharedValue(0);
-  const width = useSharedValue(0);
-  const opacity = useSharedValue(0);
-  const placed = useRef(false);
-
+  // Undefined until the option reports its box, so the pill never flashes at x=0.
+  const rect = rects[value];
+  const measured = rect !== undefined;
+  // Turns on after the render that first places the pill, so that placement does not slide.
+  const [placed, setPlaced] = useState(false);
   useEffect(() => {
-    const rect = rects[value];
-    if (!rect) return;
-    if (placed.current && !reduced) {
-      const config = { duration: motion.duration.base, easing: EASE_IN_OUT };
-      x.value = withTiming(rect.x, config);
-      width.value = withTiming(rect.width, config);
-    } else {
-      x.value = rect.x;
-      width.value = rect.width;
-    }
-    placed.current = true;
-    opacity.value = 1;
-  }, [rects, value, reduced, x, width, opacity]);
+    if (measured) setPlaced(true);
+  }, [measured]);
+  const slide = placed && !reduced;
 
-  const style = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    width: width.value,
-    transform: [{ translateX: x.value }],
-  }));
+  // `transform` moves on the compositor, `width` does not — it is a layout property, so the
+  // browser reflows the indicator on every frame of the slide. It stays a width because the
+  // pill is ~60px with fully rounded ends, which a non-uniform scaleX would deform.
+  const style: CSSStyle<ViewStyle> = {
+    opacity: rect ? 1 : 0,
+    width: rect?.width ?? 0,
+    transform: [{ translateX: rect?.x ?? 0 }],
+    transitionProperty: ["transform", "width"],
+    transitionDuration: slide ? motion.duration.base : 0,
+    transitionTimingFunction: EASE_IN_OUT,
+  };
 
   const measure = (key: T) => (e: LayoutChangeEvent) => {
     const { x: nx, width: nw } = e.nativeEvent.layout;

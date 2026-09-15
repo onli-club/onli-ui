@@ -23,7 +23,7 @@ and 2× for `selectable` user content (`maxFontSizeMultiplier` overrides). Contr
   of stylesheet order.
 
 ## Button
-`<Button title variant size icon loading disabled …PressableProps>`
+`<Button title variant size icon loading progress disabled …PressableProps>`
 - `variant`: `primary` (green pill), `secondary` (white + border), `tonal` (green-subtle),
   `ghost`, `danger` (subtle red). `size`: `sm | md | lg` (heights 36/44/48).
 - `icon` takes a lucide icon component. Web gets hover states; all get pressed states.
@@ -33,7 +33,15 @@ and 2× for `selectable` user content (`maxFontSizeMultiplier` overrides). Contr
 - A `title` that changes on a mounted button (Join → Leave) crossfades instead of snapping:
   the icon and label sit in a reanimated view that dips to 40% and comes back. Never on mount,
   and skipped under `useReducedMotion()`. That view carries the icon/label gap as a number —
-  NativeWind drops a `className` on an animated view, so the gap cannot be a class.
+  NativeWind drops a `className` on an animated view, so the gap cannot be a class. The dip
+  is one keyframe animation through reanimated's CSS API (a two-step dip as a transition
+  would need two style commits), and the view is keyed by a dip counter because a CSS
+  animation only replays when its name changes or the view remounts.
+- `progress` (0–1) turns the button into its own progress indicator: a `brand-subtle` fill
+  grows behind the label (width transition over `fast`, none under reduce-motion), the button
+  is busy but not dimmed, and label changes do not dip, because a percentage that ticks is one
+  state, not a change of state. Used by the composer's video button while a clip is prepared
+  and uploaded.
 
 ## IconButton
 `<IconButton icon accessibilityLabel size tone variant …>` — 40px round hit target.
@@ -83,9 +91,10 @@ announced. `multiline` gives 120px min height, top-aligned.
 `<Divider/>` — hairline. `<Skeleton className="h-4 w-40"/>` — pulsing placeholder block;
 `rounded-sm` by default, override with a radius class (`rounded-full` for avatar circles).
 The classes sit on a plain `View` wrapping the animated fill — NativeWind does not interop
-reanimated's `Animated.View`, so a `className` there would be dropped. The pulse is a
-reanimated loop (700ms each way, `ease-in-out`): a loading indicator, so it is exempt from
-the token durations. Reduced motion holds it at a flat 0.75 opacity.
+reanimated's `Animated.View`, so a `className` there would be dropped. The pulse is an
+infinite keyframe animation through reanimated's CSS API (700ms each way, `ease-in-out`): a
+loading indicator, so it is exempt from the token durations. Reduced motion drops the
+animation and holds it at a flat 0.75 opacity.
 
 ## ListRow
 `<ListRow title subtitle left right chevron dense onPress accessibilityRole>` —
@@ -98,11 +107,16 @@ the row is a `button`; pass `accessibilityRole="link"` when it navigates.
 Exposed as a `tablist` of `tab`s with the active one `selected`.
 
 One white pill **slides** between the options rather than each option re-colouring: a single
-reanimated view under the labels, animated to the active option's measured x and width over
-`duration-base` on `ease-in-out`. Each option reports its box through `onLayout`; the pill is
-invisible until the first measurement (so it never flashes at x=0), is placed without
-animation that first time, and jumps straight to the new option under `useReducedMotion()`.
-Only the labels change colour on their own (`default` ↔ `muted`).
+reanimated view under the labels, transitioning to the active option's measured x and width
+over `duration-base` on `ease-in-out`. Each option reports its box through `onLayout`; the
+pill is invisible until the first measurement (so it never flashes at x=0), is placed without
+animation that first time, and jumps straight to the new option under `useReducedMotion()` —
+both of those are a `transitionDuration` of 0 for that update, not a separate path. Only the
+labels change colour on their own (`default` ↔ `muted`).
+
+`transform` moves on the compositor; `width` does not — it is a layout property, so the
+browser reflows the indicator on every frame of the slide. It stays a width anyway: the pill
+is ~60px with fully rounded ends, which a non-uniform `scaleX` would deform.
 
 The padding lives on an outer view and the options on an inner one with none. Yoga positions
 an absolute child from its parent's *border* edge while the web positions it from the *padding*
@@ -137,10 +151,13 @@ headings, in-page sections), exposed as a level-2 heading (`accessibilityRole="h
 no margins; spacing belongs to the layout around it.
 
 ## FormError
-`<FormError message tone size className>` — a form's error or status line. Renders nothing
+`<FormError message tone size card className>` — a form's error or status line. Renders nothing
 while `message` is empty; when it appears it is a live region (`role="alert"` / `aria-live`
 on web and Android) and is announced on iOS via `announce()`. `tone="status"` for
 confirmations ("Copied", "Saved"). Use it for every inline error instead of a red `Text`.
+- `card` renders the message as a notice card (icon + text on `danger-subtle`, or
+  `surface-sunken` for `status`) for errors that sit beside the content they concern rather
+  than under a field.
 
 ## announce, useReducedMotion (`@onli/ui`)
 `announce(message)` speaks a message on iOS VoiceOver (no-op elsewhere, where live regions
@@ -149,6 +166,14 @@ changes; `Skeleton`, `Segmented` and `Button` use it, and any consumer animation
 it turns off is the travel, never the end state: the segmented pill still lands on the active
 option, the button label still changes — they just stop moving to get there. Durations and
 curves come from `tokens.motion` (`docs/TOKENS.md`).
+
+All three animate through **reanimated's CSS API** — `transition*` / `animation*` keys on an
+`Animated.*` style, with `css.keyframes(...)` for keyframe sets — rather than shared values
+and `withTiming`. On web that becomes real CSS the browser runs off the main thread; on
+native it feeds reanimated's own driver. Reduced motion is still ours to honour: it removes
+the `animationName`, or sets the transition duration to 0. Keyframe blocks are typed with
+`KeyframeStyle` from `src/native/keyframes.ts` (internal, not exported): `ViewStyle` minus
+React Native's own string `animationTimingFunction`, which collides with reanimated's.
 
 ## Spinner
 `<Spinner size tone className>` — brand-colored ActivityIndicator (`large` by default) so
