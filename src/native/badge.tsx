@@ -1,5 +1,7 @@
+import type { LucideIcon } from "lucide-react-native";
 import { View } from "react-native";
 import { cn } from "./cn";
+import { Icon } from "./icon";
 import { Text } from "./text";
 
 /**
@@ -24,16 +26,22 @@ export function CountBadge({ count, className }: { count: number; className?: st
 }
 
 const PILL_TONES = {
-  neutral: { box: "bg-surface-sunken", text: "muted" },
-  brand: { box: "bg-brand-subtle", text: "brand" },
-  accent: { box: "bg-accent-subtle", text: "accent" },
-  danger: { box: "bg-danger-subtle", text: "danger" },
+  neutral: { box: "bg-surface-sunken", text: "muted", glyph: "ink-muted" },
+  brand: { box: "bg-brand-subtle", text: "brand", glyph: "brand" },
+  accent: { box: "bg-accent-subtle", text: "accent", glyph: "accent-strong" },
+  danger: { box: "bg-danger-subtle", text: "danger", glyph: "danger" },
   // Rarity ramp for earned badges — grey, green, blue, gold, the ladder games already
   // taught everyone. Matches BadgeMedal exactly: one rarity must never wear two colours.
-  common: { box: "bg-rarity-common-bg", text: "rarity-common" },
-  uncommon: { box: "bg-rarity-uncommon-bg", text: "rarity-uncommon" },
-  rare: { box: "bg-rarity-rare-bg", text: "rarity-rare" },
-  legendary: { box: "bg-rarity-legendary-bg", text: "rarity-legendary" },
+  common: { box: "bg-rarity-common-bg", text: "rarity-common", glyph: "rarity-common-ink" },
+  uncommon: { box: "bg-rarity-uncommon-bg", text: "rarity-uncommon", glyph: "rarity-uncommon-ink" },
+  rare: { box: "bg-rarity-rare-bg", text: "rarity-rare", glyph: "rarity-rare-ink" },
+  legendary: {
+    box: "bg-rarity-legendary-bg",
+    text: "rarity-legendary",
+    glyph: "rarity-legendary-ink",
+  },
+  // Achievement gold, on a dark surface only (docs/TOKENS.md).
+  gold: { box: "border border-gold/30 bg-gold/10", text: "gold", glyph: "gold" },
 } as const;
 
 export type PillTone = keyof typeof PILL_TONES;
@@ -46,23 +54,28 @@ export function Pill({
   label,
   tone = "neutral",
   size = "sm",
+  icon,
   className,
 }: {
   label: string;
   tone?: PillTone;
   size?: "sm" | "md";
+  /** A glyph before the label, in the label's colour. */
+  icon?: LucideIcon;
   className?: string;
 }) {
-  const { box, text } = PILL_TONES[tone];
+  const { box, text, glyph } = PILL_TONES[tone];
   return (
     <View
       className={cn(
         "self-start rounded-full",
         size === "sm" ? "px-2 py-0.5" : "px-3 py-1.5",
+        icon && "flex-row items-center gap-1",
         box,
         className,
       )}
     >
+      {icon ? <Icon icon={icon} size={size === "sm" ? 12 : 14} tone={glyph} /> : null}
       <Text variant="label" className="text-xs" tone={text}>
         {label}
       </Text>

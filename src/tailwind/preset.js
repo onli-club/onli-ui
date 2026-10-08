@@ -41,6 +41,7 @@ module.exports = {
         "accent": "#DE9A3D",
         "accent-strong": "#95601A",
         "accent-subtle": "#FAEDD4",
+        "gold": "#EFC788",
         "danger": "#A83F2C",
         "danger-strong": "#8A3222",
         "danger-subtle": "#F9E5DE",

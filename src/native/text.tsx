@@ -24,6 +24,7 @@ const TONES = {
   brand: "text-brand",
   "on-brand": "text-on-brand",
   accent: "text-accent-strong",
+  gold: "text-gold",
   danger: "text-danger",
   "rarity-common": "text-rarity-common-ink",
   "rarity-uncommon": "text-rarity-uncommon-ink",

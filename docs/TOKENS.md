@@ -31,6 +31,7 @@ sessions (light, low-glare, high contrast for a 30–45 audience).
 | `brand-subtle` / `brand-faint` | `bg-brand-subtle` | Tonal fills, selected states |
 | `on-brand` | `text-on-brand` | Text/icons on brand fills |
 | `accent` / `accent-strong` / `accent-subtle` | `bg-accent-subtle` | Gamification only. `accent` fails contrast as text — use `accent-strong` for text |
+| `gold` | `bg-gold`, `text-gold`, `border-gold/30` | Achievement gold on a DARK surface only (the app's finished-course card on `brand-deep`): champagne (`amber-300`), where `accent` reads orange. Fails contrast on white or paper. Spent by `Text`/`Icon` `tone="gold"` and the `gold` `Pill` |
 | `heat-1` … `heat-4` | `bg-heat-3` | Activity-grid intensity ramp only (green-400 → 500 → 700 → 900). Starts at green-400 so a one-action day is ≥3:1 against the card. Level 0 is `surface-sunken`, not a heat token |
 
 | `danger` / `danger-strong` / `danger-subtle` | `text-danger` | Destructive |

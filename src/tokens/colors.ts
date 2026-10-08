@@ -126,6 +126,9 @@ export const semantic = {
   accent: primitives.amber[500],
   "accent-strong": primitives.amber[700],
   "accent-subtle": primitives.amber[100],
+  // achievement gold on a dark surface (the finished-course card on brand-deep): champagne, where
+  // `accent` reads orange
+  gold: primitives.amber[300],
 
   // status
   danger: primitives.clay[600],

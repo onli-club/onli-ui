@@ -10,7 +10,8 @@ and 2× for `selectable` user content (`maxFontSizeMultiplier` overrides). Contr
 `min-h-*`, never `h-*`, so scaled text never clips.
 - `variant`: `title` (section titles), `heading` (card/post titles), `subheading` (bold UI),
   `body` (default), `body-sm`, `label` (buttons/forms/tabs), `caption` (defaults to muted tone).
-- `tone`: `default | secondary | muted | faint | inverse | brand | on-brand | accent | danger`.
+- `tone`: `default | secondary | muted | faint | inverse | brand | on-brand | accent | gold | danger`
+  (`gold` only on a dark surface, docs/TOKENS.md).
 - `size`: a type-scale step (`xs`…`3xl`) that replaces the variant's size — e.g.
   `variant="body" size="sm"` for a dense row. There is no 15px step. Prefer this over a
   `text-*` class in `className`.
@@ -74,9 +75,12 @@ colour is never the only cue. Pressable chips report `selected` state and carry 
 `<CountBadge count>` — unread counter (`danger` fill, 6:1 with the label, 11px), caps at 99+,
 renders nothing at 0. Hidden from assistive tech: put the count in the label of the control
 it decorates ("Notifications, 3 unread").
-`<Pill label tone size>` — status pill. Status tones: `neutral | brand | accent | danger`.
+`<Pill label tone size icon>` — status pill. Status tones: `neutral | brand | accent | danger`.
 Rarity tones for earned badges: `common | uncommon | rare | legendary` — the grey → green →
-blue → gold ladder, identical to `BadgeMedal`'s, so a rarity never wears two colours. `size`: `sm` (default, 11px — inline metadata like "Pinned") or
+blue → gold ladder, identical to `BadgeMedal`'s, so a rarity never wears two colours. `gold`
+(a hairline gold border on a faint gold fill) is for a dark surface only, like the app's
+finished-course card. `icon` (a lucide glyph) goes before the label in the label's colour,
+12px at `sm` and 14px at `md`. `size`: `sm` (default — inline metadata like "Pinned") or
 `md` (roomier padding — standalone chips like profile badges); both are 12px, the floor of the
 type scale. Badge rarity comes from the API;
 see `onli-server/docs/PROGRESSION.md`.
