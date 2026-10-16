@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { type LayoutChangeEvent, Pressable, View, type ViewStyle } from "react-native";
-import Animated, { type CSSStyle, cubicBezier } from "react-native-reanimated";
+import Animated, { type CSSStyle } from "react-native-reanimated";
 import { motion, semantic, shadows } from "../tokens";
 import { useReducedMotion } from "./a11y";
 import { cn } from "./cn";
+import { EASE_IN_OUT } from "./easing";
+import { WASH } from "./recipes";
 import { Text } from "./text";
-
-const EASE_IN_OUT = cubicBezier(...motion.curve.inOut);
 
 const INDICATOR = {
   position: "absolute",
@@ -31,7 +31,8 @@ export function Segmented<T extends string>({
   onChange,
   className,
 }: {
-  options: ReadonlyArray<{ value: T; label: string }>;
+  /** `count` sits in a chip after the label (Notes 3), never joined to it by a character. */
+  options: ReadonlyArray<{ value: T; label: string; count?: number }>;
   value: T;
   onChange: (value: T) => void;
   className?: string;
@@ -80,6 +81,7 @@ export function Segmented<T extends string>({
             <Pressable
               key={o.value}
               accessibilityRole="tab"
+              accessibilityLabel={o.count ? `${o.label}, ${o.count}` : undefined}
               accessibilityState={{ selected: active }}
               hitSlop={6}
               onLayout={measure(o.value)}
@@ -87,16 +89,25 @@ export function Segmented<T extends string>({
               // the wash would paint over the indicator, so only an unselected option wears it
               className={cn(
                 "rounded-full px-4 py-1.5 transition-colors duration-fast",
-                !active && "hover:bg-surface-hover active:bg-surface-press",
+                !active && WASH,
               )}
             >
-              <Text
-                variant="label"
-                tone={active ? "default" : "muted"}
-                className="transition-colors duration-fast"
-              >
-                {o.label}
-              </Text>
+              <View className="flex-row items-center gap-1.5">
+                <Text
+                  variant="label"
+                  tone={active ? "default" : "muted"}
+                  className="transition-colors duration-fast"
+                >
+                  {o.label}
+                </Text>
+                {o.count ? (
+                  <View className="min-w-[18px] items-center rounded-full bg-brand-subtle px-1.5">
+                    <Text variant="label" tone="brand" className="text-[11px] leading-[16px]">
+                      {o.count}
+                    </Text>
+                  </View>
+                ) : null}
+              </View>
             </Pressable>
           );
         })}

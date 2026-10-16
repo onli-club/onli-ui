@@ -9,6 +9,8 @@ import { wordmarkSizes } from "../src/wordmark";
 const root = join(import.meta.dir, "..");
 const banner = "GENERATED from src/tokens — edit tokens, then `bun run generate`.";
 
+const { sidebar, rail, ...columns } = layout;
+
 const colors: Record<string, string | Record<string, string>> = { ...semantic };
 for (const [name, scale] of Object.entries(primitives)) {
   const entries = Object.fromEntries(Object.entries(scale).map(([k, v]) => [k, v]));
@@ -26,9 +28,9 @@ const preset = {
       ),
       borderRadius: Object.fromEntries(Object.entries(radii).map(([k, v]) => [k, `${v}px`])),
       boxShadow: shadows,
-      maxWidth: Object.fromEntries(Object.entries(layout).map(([k, v]) => [k, `${v}px`])),
-      // fixed shell columns (w-sidebar / w-rail); content columns stay max-widths
-      width: { sidebar: `${layout.sidebar}px`, rail: `${layout.rail}px` },
+      // content columns are max-widths; the fixed shell columns are widths (w-sidebar / w-rail)
+      maxWidth: Object.fromEntries(Object.entries(columns).map(([k, v]) => [k, `${v}px`])),
+      width: { sidebar: `${sidebar}px`, rail: `${rail}px` },
       transitionDuration: Object.fromEntries(
         Object.entries(motion.duration).map(([k, v]) => [k, `${v}ms`]),
       ),
@@ -72,6 +74,7 @@ writeFileSync(
 // biome formats css hex lowercase
 const thumb = semantic["line-strong"].toLowerCase();
 const thumbHover = semantic["ink-faint"].toLowerCase();
+const focusRing = semantic.focus.toLowerCase();
 const baseCss = `/* ${banner} Shared web base styles; import after the Tailwind entry. */
 
 /* All scrollbars: pill thumb only, no track. */
@@ -96,6 +99,15 @@ const baseCss = `/* ${banner} Shared web base styles; import after the Tailwind 
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+/* One brand ring for every keyboard-focused control. Layered, so a consumer's own rule (a
+   field that keeps its border signal instead) wins over it. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid ${focusRing};
+    outline-offset: 2px;
+  }
+}
 `;
 writeFileSync(join(root, "src/css/base.css"), baseCss);
 
@@ -103,6 +115,12 @@ writeFileSync(join(root, "src/css/base.css"), baseCss);
 // single `Geist` family, so the family tokens are re-pointed at it and the weight is applied
 // separately — Tailwind v4 has no `--font-*--font-weight` modifier, hence the base rules.
 const webStack = `"${webFontFamily}", ui-sans-serif, system-ui, sans-serif`;
+const webFontHref = `https://fonts.googleapis.com/css2?family=${webFontFamily}:wght@${Object.values(
+  fontWeights,
+)
+  .slice()
+  .sort((a, b) => a - b)
+  .join(";")}&display=swap`;
 const webFamilyVars = Object.keys(fontFamilies)
   .map((name) => `  --font-${name}: ${webStack};`)
   .join("\n");
@@ -113,12 +131,7 @@ const fontsWebCss = `/* ${banner} Web consumers only; @import after theme.css.
    Requires ${webFontFamily} from Google Fonts — add to the host HTML <head>:
    <link rel="preconnect" href="https://fonts.googleapis.com">
    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${webFontFamily}:wght@${Object.values(
-     fontWeights,
-   )
-     .slice()
-     .sort((a, b) => a - b)
-     .join(";")}&display=swap"> */
+   <link rel="stylesheet" href="${webFontHref}"> */
 @theme {
 ${webFamilyVars}
 }
@@ -130,11 +143,12 @@ ${webWeightRules}
 writeFileSync(join(root, "src/css/fonts-web.css"), fontsWebCss);
 
 // The wordmark for web consumers: same metrics as the RN `Wordmark`, so it is never hand-built.
-const wordmarkRules = Object.entries(wordmarkSizes)
-  .map(
-    ([name, m]) =>
-      `.wordmark-${name} {\n  font-size: ${m.fontSize}px;\n  line-height: ${m.lineHeight}px;\n  letter-spacing: ${m.letterSpacing}px;\n}`,
-  )
+// `.wordmark` alone is the default size, as `<Wordmark>` is; every other size is a modifier.
+const { md: defaultWordmark, ...wordmarkModifiers } = wordmarkSizes;
+const wordmarkMetrics = (m: { fontSize: number; lineHeight: number; letterSpacing: number }) =>
+  `  font-size: ${m.fontSize}px;\n  line-height: ${m.lineHeight}px;\n  letter-spacing: ${m.letterSpacing}px;`;
+const wordmarkRules = Object.entries(wordmarkModifiers)
+  .map(([name, m]) => `.wordmark-${name} {\n${wordmarkMetrics(m)}\n}`)
   .join("\n");
 const wordmarkCss = `/* ${banner} Web consumers only; @import after fonts-web.css.
    <span class="wordmark wordmark-sm">Onli<span class="wordmark-dot">.</span></span> */
@@ -142,6 +156,7 @@ const wordmarkCss = `/* ${banner} Web consumers only; @import after fonts-web.cs
   font-family: var(--font-display);
   font-weight: ${fontWeights.display};
   color: var(--color-brand-strong);
+${wordmarkMetrics(defaultWordmark)}
 }
 .wordmark-dot {
   color: var(--color-accent);
@@ -171,7 +186,9 @@ const tokenExports = {
   fontFamilies,
   fontWeights,
   webFontFamily,
+  webFontHref,
   fontSizes,
+  wordmarkSizes,
 };
 const tokensDir = join(root, "src/tokens/dist");
 mkdirSync(tokensDir, { recursive: true });

@@ -17,7 +17,6 @@ module.exports = {
           "400": "#5D6961",
           "500": "#57635C",
           "700": "#232B26",
-          "900": "#20281F",
           "DEFAULT": "#232B26"
         },
         "ink-secondary": "#57635C",
@@ -41,7 +40,6 @@ module.exports = {
         "accent": "#DE9A3D",
         "accent-strong": "#95601A",
         "accent-subtle": "#FAEDD4",
-        "gold": "#EFC788",
         "danger": "#A83F2C",
         "danger-strong": "#8A3222",
         "danger-subtle": "#F9E5DE",
@@ -69,8 +67,6 @@ module.exports = {
         "green": {
           "50": "#EFF5F1",
           "100": "#DFEBE4",
-          "200": "#BFD7CB",
-          "300": "#95BAA8",
           "400": "#639A80",
           "500": "#3B7D62",
           "600": "#20614E",
@@ -84,7 +80,6 @@ module.exports = {
           "200": "#F1EFEA",
           "300": "#E8E5DE",
           "400": "#D7D3C9",
-          "500": "#B5B0A2",
           "600": "#8A8578"
         },
         "amber": {
@@ -96,26 +91,18 @@ module.exports = {
           "800": "#6F4712"
         },
         "steel": {
-          "100": "#E4EDF8",
-          "300": "#93B6E0",
           "500": "#4A7CB5",
           "600": "#2F6098",
           "700": "#264E7C"
         },
         "violet": {
-          "100": "#EDE8F9",
-          "300": "#B8A0E2",
-          "500": "#7A56B5",
-          "600": "#63449A",
-          "700": "#4F357C"
+          "500": "#7A56B5"
         },
         "bronze": {
-          "500": "#B4763C",
-          "600": "#96602F"
+          "500": "#B4763C"
         },
         "clay": {
           "100": "#F9E5DE",
-          "400": "#D06A52",
           "500": "#C9573F",
           "600": "#A83F2C",
           "700": "#8A3222"
@@ -180,8 +167,6 @@ module.exports = {
       "maxWidth": {
         "reading": "760px",
         "modal": "440px",
-        "sidebar": "264px",
-        "rail": "300px",
         "shell": "1384px"
       },
       "width": {

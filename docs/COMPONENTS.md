@@ -4,14 +4,18 @@ React Native + NativeWind, shipped as TS source. `className` (where offered) is 
 margins/layout tweaks only — visual identity stays inside the component. Avatar,
 ConfirmButton, and Icon take no `className`. Import from `@onli/ui`.
 
+The class recipes the pressables share — the press dip, the brand fill, the transparent
+hover/press wash, the subtle danger fill — are named once in `src/native/recipes.ts`
+(internal). Each is one whole literal: consumers' Tailwind scans the kit's source as text, so
+a class built from fragments would never compile.
+
 ## Text
 `<Text variant tone size className …TextProps>` — caps OS font scaling at 1.3× for chrome
 and 2× for `selectable` user content (`maxFontSizeMultiplier` overrides). Controls use
 `min-h-*`, never `h-*`, so scaled text never clips.
 - `variant`: `title` (section titles), `heading` (card/post titles), `subheading` (bold UI),
   `body` (default), `body-sm`, `label` (buttons/forms/tabs), `caption` (defaults to muted tone).
-- `tone`: `default | secondary | muted | faint | inverse | brand | on-brand | accent | gold | danger`
-  (`gold` only on a dark surface, docs/TOKENS.md).
+- `tone`: `default | secondary | muted | inverse | brand | on-brand | accent | danger`.
 - `size`: a type-scale step (`xs`…`3xl`) that replaces the variant's size — e.g.
   `variant="body" size="sm"` for a dense row. There is no 15px step. Prefer this over a
   `text-*` class in `className`.
@@ -25,8 +29,8 @@ and 2× for `selectable` user content (`maxFontSizeMultiplier` overrides). Contr
 
 ## Button
 `<Button title variant size icon loading progress disabled …PressableProps>`
-- `variant`: `primary` (green pill), `secondary` (white + border), `tonal` (green-subtle),
-  `ghost`, `danger` (subtle red). `size`: `sm | md | lg` (heights 36/44/48).
+- `variant`: `primary` (green pill), `secondary` (white + border), `ghost`, `danger` (subtle
+  red). `size`: `sm | md | lg` (heights 36/44/48).
 - `icon` takes a lucide icon component. Web gets hover states; all get pressed states.
 - `loading` swaps the label for a spinner visually only: the button keeps `title` as its
   accessible name and reports `busy`, so assistive tech never hears an unnamed control.
@@ -45,7 +49,7 @@ and 2× for `selectable` user content (`maxFontSizeMultiplier` overrides). Contr
   and uploaded.
 
 ## IconButton
-`<IconButton icon accessibilityLabel size tone variant …>` — 40px round hit target.
+`<IconButton icon accessibilityLabel size variant …>` — 40px round hit target.
 `accessibilityLabel` is **required**: the glyph is the only content, so the label is the
 button's whole name to a screen reader ("Back", "Search", "Close"). `variant`: `default`
 (transparent, hover/press wash) or `primary` (brand fill + on-brand icon, e.g. a send
@@ -77,19 +81,18 @@ renders nothing at 0. Hidden from assistive tech: put the count in the label of 
 it decorates ("Notifications, 3 unread").
 `<Pill label tone size icon>` — status pill. Status tones: `neutral | brand | accent | danger`.
 Rarity tones for earned badges: `common | uncommon | rare | legendary` — the grey → green →
-blue → gold ladder, identical to `BadgeMedal`'s, so a rarity never wears two colours. `gold`
-(a hairline gold border on a faint gold fill) is for a dark surface only, like the app's
-finished-course card. `icon` (a lucide glyph) goes before the label in the label's colour,
+blue → gold ladder, identical to `BadgeMedal`'s, so a rarity never wears two colours. `icon`
+(a lucide glyph) goes before the label in the label's colour,
 12px at `sm` and 14px at `md`. `size`: `sm` (default — inline metadata like "Pinned") or
 `md` (roomier padding — standalone chips like profile badges); both are 12px, the floor of the
 type scale. Badge rarity comes from the API;
 see `onli-server/docs/PROGRESSION.md`.
 
 ## Input
-`<Input label error helper multiline …TextInputProps>` — white field, `rounded-lg`,
-`line-input` border, focus border on web, error/helper line below. `label` doubles as the
-accessible name (pass `accessibilityLabel` to override); `error` sets `aria-invalid` and is
-announced. `multiline` gives 120px min height, top-aligned.
+`<Input label helper multiline …TextInputProps>` — white field, `rounded-lg`,
+`line-input` border, focus border on web, helper line below. `label` doubles as the
+accessible name (pass `accessibilityLabel` to override). There is no error prop: errors go in
+a `FormError`. `multiline` gives 120px min height, top-aligned.
 
 ## Divider, Skeleton
 `<Divider/>` — hairline. `<Skeleton className="h-4 w-40"/>` — pulsing placeholder block;
@@ -104,11 +107,13 @@ animation and holds it at a flat 0.75 opacity.
 `<ListRow title subtitle left right chevron dense onPress accessibilityRole>` —
 settings/notification style row. `dense` is the compact variant (rails, secondary lists):
 tighter padding, label-weight two-line title, caption subtitle, 16px chevron. With `onPress`
-the row is a `button`; pass `accessibilityRole="link"` when it navigates.
+the row is a `button`; pass `accessibilityRole="link"` when it navigates. `subtitle` is a
+string or a node: a node goes under the title as it is, for a line of icon + value facts.
 
 ## Segmented
 `<Segmented options value onChange>` — pill switcher (e.g. Top/New) on a sunken track.
-Exposed as a `tablist` of `tab`s with the active one `selected`.
+Exposed as a `tablist` of `tab`s with the active one `selected`. An option's `count` is a
+small brand chip after its label (Notes 3); a label never carries its count after a separator.
 
 One white pill **slides** between the options rather than each option re-colouring: a single
 reanimated view under the labels, transitioning to the active option's measured x and width
@@ -132,9 +137,9 @@ padding between them, the pill and the measured x share one origin everywhere.
 `action` slot for a Button.
 
 ## ConfirmButton
-`<ConfirmButton label confirmLabel onConfirm small>` — two-tap destructive pattern (first tap
-arms for 8s, second fires). Arming is announced and reported as `expanded`; `small` carries
-10px hitSlop so the target still reaches 44px. Works on web and native; no Alert.
+`<ConfirmButton label confirmLabel onConfirm>` — two-tap destructive pattern (first tap
+arms for 8s, second fires). Arming is announced and reported as `expanded`. A compact pill
+with 10px hitSlop, so the target still reaches 44px. Works on web and native; no Alert.
 
 ## Icon
 `<Icon icon={Home} size tone strokeWidth fill>` — lucide wrapper wired to semantic colors
@@ -142,11 +147,10 @@ arms for 8s, second fires). Arming is announced and reported as `expanded`; `sma
 flame); omit it for the default outline.
 
 ## IconCircle
-`<IconCircle icon size iconSize tone strokeWidth fill>{children}` — circular tinted glyph
-holder (rail icons, notification glyphs, empty states, play overlays). `size` is the circle
-diameter in px (default 40); the icon defaults to ~45% of it. Tones pair a tint with an icon
-color: `brand` (subtle), `brand-faint`, `accent`, `danger`, `neutral`, `overlay` (scrim over
-media). `children` (an emoji/character) replaces `icon`.
+`<IconCircle icon size iconSize tone strokeWidth fill>` — circular tinted glyph holder (rail
+icons, notification glyphs, empty states, play overlays). `size` is the circle diameter in px
+(default 40); the icon defaults to ~45% of it. Tones pair a tint with an icon color: `brand`
+(subtle), `brand-faint`, `accent`, `danger`, `overlay` (scrim over media).
 
 ## SectionLabel
 `<SectionLabel className>` — the 12px sentence-case muted section label (sidebar groups, rail
@@ -177,7 +181,8 @@ and `withTiming`. On web that becomes real CSS the browser runs off the main thr
 native it feeds reanimated's own driver. Reduced motion is still ours to honour: it removes
 the `animationName`, or sets the transition duration to 0. Keyframe blocks are typed with
 `KeyframeStyle` from `src/native/keyframes.ts` (internal, not exported): `ViewStyle` minus
-React Native's own string `animationTimingFunction`, which collides with reanimated's.
+React Native's own string `animationTimingFunction`, which collides with reanimated's. The
+token curves as reanimated timing functions are `src/native/easing.ts` (internal too).
 
 ## Spinner
 `<Spinner size tone className>` — brand-colored ActivityIndicator (`large` by default) so
@@ -189,16 +194,16 @@ progress).
 
 ## Wordmark
 `<Wordmark size className>` — the "Onli." logo (brand-strong + accent period). Sizes:
-`sm` 22px (nav bars), `md` 24px (default, drawers), `xl` 44px (sign-in hero). The px
-metrics live in `src/wordmark.ts` (`wordmarkSizes`, also exported from `@onli/ui/wordmark`)
-and are the logo's identity. Web consumers get the same logo from the generated
-`@onli/ui/css/wordmark.css`: `<span class="wordmark wordmark-sm">Onli<span
-class="wordmark-dot">.</span></span>` — never hand-build the wordmark in either kit.
+`sm` 22px (nav bars), `md` 24px (default, drawers). The px metrics live in `src/wordmark.ts`
+(`wordmarkSizes`, also in `@onli/ui/tokens` for the server's emails) and are the logo's
+identity. Web consumers get the same logo from the generated `@onli/ui/css/wordmark.css`:
+`.wordmark` alone is the default `md`, and `wordmark-sm` the smaller size — `<span
+class="wordmark wordmark-sm">Onli<span class="wordmark-dot">.</span></span>`. Never hand-build
+the wordmark in either kit.
 
 ## Channel icons (`@onli/ui/channel-icons`)
 A vendored 36-icon subset of [Twemoji](https://github.com/jdecked/twemoji) v17.0.3, exported
-as `channelIcons` (name → inline SVG string), `channelIconNames`, `isChannelIcon`, and
-`getChannelIcon`.
+as `channelIcons` (name → inline SVG string), `isChannelIcon`, and `getChannelIcon`.
 
 **Look a name up with `getChannelIcon(name)` (or guard with `isChannelIcon`), never by
 indexing `channelIcons` directly.** Names come from the database, and indexing a plain object
@@ -279,7 +284,8 @@ Rules for adding one, all learned by drawing the first set and looking at it at 
 `rankInsigniaSvg` in `@onli/ui/rank-insignia-svg`: a shield filled in the rung's own colour
 (`rank-{tier}`) carrying the rung's drawing from `@onli/ui/rank-art`. Built exactly the way
 `BadgeMedal` is — one SVG string, flat fills, no CSS — so a badge and an insignia in one row
-are the same kind of object.
+are the same kind of object. It is hidden from assistive tech: the rung's name is always text
+beside it.
 
 `rank` is the rung's **permanent key** (`beginner`, `enthusiast`, …), never its name:
 Admin → Levels can rename a rung, and a rename must not swap or orphan its mark. A rung with
@@ -300,8 +306,8 @@ own frame: never wrap it in an `IconCircle`.**
 
 ## Badge icons (`@onli/ui/badge-icons`)
 A curated 48-icon subset of [Lucide](https://lucide.dev), exported as `badgeIcons`
-(name → inline SVG string), `badgeIconNames`, `isBadgeIcon`, and `getBadgeIcon` (look names
-up through the getter, as for channel icons). 24 are the shipped badges; the rest are spares
+(name → inline SVG string), `isBadgeIcon`, and `getBadgeIcon` (look names up through the
+getter, as for channel icons). 24 are the shipped badges; the rest are spares
 so staff can add a badge in the admin panel without a deploy.
 
 Monochrome stroke art, deliberately unlike the flat multi-colour channel icons: a badge's
@@ -323,13 +329,9 @@ colour staff pick in the panel is exactly what a member sees.
 Geometry is a runtime module rather than a generated file because the colours are composed per
 call; only the glyph paths are generated (`badge-icons.ts`).
 
-Gradient ids are keyed by rarity (`of-rare`) rather than made unique per instance: several
-medals of one tier inlined into the same document then share one identical definition instead
-of colliding on different ones.
-
 ## Rank art (`@onli/ui/rank-art`)
 Six hand-authored drawings, one per rung, keyed by rung key: `rankArt(key, palette)`,
-`rankArtPalette(key, muted)`, `rankKeys`, `isRankKey`, and the `RankKey` type. The badge
+`rankArtPalette(key, muted)`, `isRankKey`, and the `RankKey` type. The badge
 treatment applied to standing: a white subject on the rung's colour, with one lighter tint
 (`soft`) for a lit facet or the wreath and one darker (`deep`) for a shadow or band. The
 frame is a **shield** — the one silhouette the badge frames avoid, and what games put a rank

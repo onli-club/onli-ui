@@ -1,3 +1,5 @@
+import { type Art, type BadgeArtPalette, LOCKED_PALETTE, WHITE } from "./art";
+
 /**
  * Bespoke artwork, one drawing per badge, keyed by the badge's permanent `code`.
  *
@@ -22,19 +24,6 @@
  * rarest tier still reads at a glance (Himanshu's call, 2026-09-08).
  */
 
-export type BadgeArtPalette = {
-  /** The frame's fill. */
-  bg: string;
-  /** The subject. White on every earned badge. */
-  ink: string;
-  /** Interior detail on the subject — lines on a sheet, a lit facet. */
-  soft: string;
-  /** The one accent that gives the subject an edge, and glyph detail cut back into the frame. */
-  deep: string;
-};
-
-const WHITE = "#FFFFFF";
-
 /**
  * Ten curated hues plus gold. Chosen against the warm paper ground rather than sampled from a
  * wheel: every `bg` carries white at 3:1 or better, and no two adjacent hues collide in a grid.
@@ -52,16 +41,6 @@ const HUES = {
   plum: { bg: "#8B5CF6", soft: "#C8AEFB", deep: "#6435CE" },
   gold: { bg: "#DFA22B", soft: "#F2CE85", deep: "#9A6A12" },
 } as const;
-
-/** Not yet earned: the same drawing in the paper's greys, so it is recognisably what you get. */
-export const LOCKED_PALETTE: BadgeArtPalette = {
-  bg: "#D7D3C9",
-  ink: "#FDFCFA",
-  soft: "#C9C4B8",
-  deep: "#9A9488",
-};
-
-type Art = (p: BadgeArtPalette) => string;
 
 /* ---------------------------------------------------------------- volume: sheets and posts */
 
@@ -206,7 +185,7 @@ const craftCode: Art = (p) =>
   `<path d="M26.4 14.6L21.6 33.4" fill="none" stroke="${p.soft}" stroke-width="3.2" stroke-linecap="round"/>`;
 
 /** Drawing + hue for every badge in the seeded catalogue. */
-const ART: Record<string, { art: Art; hue: keyof typeof HUES }> = {
+const ART = {
   first_post: { art: firstPost, hue: "orange" },
   ten_posts: { art: tenPosts, hue: "violet" },
   first_comment: { art: firstComment, hue: "blue" },
@@ -231,9 +210,10 @@ const ART: Record<string, { art: Art; hue: keyof typeof HUES }> = {
   craft_automation_agents: { art: craftAgents, hue: "indigo" },
   craft_prompt_engineering: { art: craftPrompt, hue: "violet" },
   craft_vibe_coding: { art: craftCode, hue: "green" },
-};
+} satisfies Record<string, { art: Art; hue: keyof typeof HUES }>;
 
-export function hasBadgeArt(code: string | null | undefined): boolean {
+/** Own keys only: 'constructor' and the other prototype names are not badges. */
+export function hasBadgeArt(code: string | null | undefined): code is keyof typeof ART {
   return !!code && Object.hasOwn(ART, code);
 }
 
@@ -248,7 +228,7 @@ export function badgeArtPalette(
   earned: boolean,
 ): BadgeArtPalette {
   if (!earned) return LOCKED_PALETTE;
-  const hue = rarity === "legendary" ? HUES.gold : HUES[ART[code as string]?.hue ?? "blue"];
+  const hue = rarity === "legendary" ? HUES.gold : HUES[hasBadgeArt(code) ? ART[code].hue : "blue"];
   return { ...hue, ink: WHITE };
 }
 
@@ -257,5 +237,5 @@ export function badgeArt(
   code: string | null | undefined,
   palette: BadgeArtPalette,
 ): string | undefined {
-  return code && Object.hasOwn(ART, code) ? ART[code].art(palette) : undefined;
+  return hasBadgeArt(code) ? ART[code].art(palette) : undefined;
 }

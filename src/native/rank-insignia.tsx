@@ -1,6 +1,5 @@
-import { View } from "react-native";
-import { SvgXml } from "react-native-svg";
 import { rankInsigniaSvg } from "../rank-insignia-svg";
+import { SvgImage } from "./svg-image";
 
 /**
  * The emblem for a rung of the ladder: a shield in the rung's colour carrying its drawing,
@@ -14,6 +13,8 @@ import { rankInsigniaSvg } from "../rank-insignia-svg";
  * `muted` is a rung the member has not reached — the same drawing in the paper's greys, as a
  * locked badge is, which is what makes reaching it read as a gain.
  *
+ * Hidden from assistive tech: the rung's name is always text beside it.
+ *
  * Not sized below 20 — the top rungs carry laurel and crown detail. It draws its own frame,
  * so never wrap it in an IconCircle. Bylines stay text-only.
  */
@@ -21,24 +22,11 @@ export function RankInsignia({
   rank,
   size = 24,
   muted = false,
-  accessibilityLabel,
 }: {
   rank: string | null | undefined;
   size?: number;
   muted?: boolean;
-  /** The rung's name. Omit when the name is rendered as text beside the emblem. */
-  accessibilityLabel?: string;
 }) {
   const xml = rankInsigniaSvg({ rank, muted });
-  if (!xml) return null;
-  const a11y = accessibilityLabel
-    ? { accessible: true, accessibilityRole: "image" as const, accessibilityLabel }
-    : { "aria-hidden": true };
-  // The a11y props live on a View, never on SvgXml: on web react-native-svg forwards every
-  // prop to the raw <svg> element, and React rejects RN-only names there.
-  return (
-    <View {...a11y} style={{ width: size, height: size }}>
-      <SvgXml xml={xml} width={size} height={size} />
-    </View>
-  );
+  return xml ? <SvgImage xml={xml} size={size} /> : null;
 }

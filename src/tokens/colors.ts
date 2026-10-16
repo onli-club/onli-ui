@@ -7,8 +7,6 @@ export const primitives = {
   green: {
     50: "#EFF5F1",
     100: "#DFEBE4",
-    200: "#BFD7CB",
-    300: "#95BAA8",
     400: "#639A80",
     500: "#3B7D62",
     600: "#20614E",
@@ -23,12 +21,10 @@ export const primitives = {
     200: "#F1EFEA",
     300: "#E8E5DE",
     400: "#D7D3C9",
-    500: "#B5B0A2",
     // pewter: the common tier's solid face, dark enough to carry a white glyph
     600: "#8A8578",
   },
   ink: {
-    900: "#20281F",
     700: "#232B26",
     500: "#57635C",
     // 400 must stay ≥4.5:1 on sunken (#F1EFEA), not just white — it carries captions,
@@ -48,26 +44,18 @@ export const primitives = {
   // gamification hues. The rarity ladder players already read is grey -> green -> blue ->
   // gold, so blue and violet exist purely to complete it; amber doubles as the gold.
   steel: {
-    100: "#E4EDF8",
-    300: "#93B6E0",
     500: "#4A7CB5",
     600: "#2F6098",
     700: "#264E7C",
   },
   violet: {
-    100: "#EDE8F9",
-    300: "#B8A0E2",
     500: "#7A56B5",
-    600: "#63449A",
-    700: "#4F357C",
   },
   bronze: {
     500: "#B4763C",
-    600: "#96602F",
   },
   clay: {
     100: "#F9E5DE",
-    400: "#D06A52",
     500: "#C9573F",
     600: "#A83F2C",
     700: "#8A3222",
@@ -126,9 +114,6 @@ export const semantic = {
   accent: primitives.amber[500],
   "accent-strong": primitives.amber[700],
   "accent-subtle": primitives.amber[100],
-  // achievement gold on a dark surface (the finished-course card on brand-deep): champagne, where
-  // `accent` reads orange
-  gold: primitives.amber[300],
 
   // status
   danger: primitives.clay[600],

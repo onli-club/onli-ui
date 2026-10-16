@@ -1,12 +1,11 @@
 import { View, type ViewStyle } from "react-native";
-import Animated, { type CSSStyle, css, cubicBezier } from "react-native-reanimated";
+import Animated, { type CSSStyle, css } from "react-native-reanimated";
 import { semantic } from "../tokens/colors";
-import { motion } from "../tokens/motion";
 import { useReducedMotion } from "./a11y";
 import { cn } from "./cn";
+import { EASE_IN_OUT } from "./easing";
 import type { KeyframeStyle } from "./keyframes";
 
-const EASE_IN_OUT = cubicBezier(...motion.curve.inOut);
 // A loading pulse breathes rather than moves, so it is exempt from the token durations.
 const PULSE_MS = 1400;
 const PULSE = css.keyframes<KeyframeStyle>({

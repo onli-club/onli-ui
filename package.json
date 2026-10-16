@@ -10,13 +10,11 @@
   "exports": {
     ".": "./src/index.ts",
     "./tokens": "./src/tokens/dist/index.mjs",
-    "./fonts": "./src/fonts.ts",
     "./tailwind/preset": "./src/tailwind/preset.js",
     "./css/theme.css": "./src/css/theme.css",
     "./css/fonts-web.css": "./src/css/fonts-web.css",
     "./css/base.css": "./src/css/base.css",
     "./css/wordmark.css": "./src/css/wordmark.css",
-    "./wordmark": "./src/wordmark.ts",
     "./channel-icons": "./src/channel-icons.ts",
     "./badge-icons": "./src/badge-icons.ts",
     "./badge-art": "./src/badge-art.ts",

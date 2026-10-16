@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { cn } from "./cn";
 import { Icon } from "./icon";
+import { WASH } from "./recipes";
 import { Text } from "./text";
 
 export function ListRow({
@@ -17,7 +18,8 @@ export function ListRow({
   className,
 }: {
   title: string;
-  subtitle?: string;
+  /** A string, or a node for a line that carries more than text (icon + value facts). */
+  subtitle?: ReactNode;
   left?: ReactNode;
   right?: ReactNode;
   chevron?: boolean;
@@ -35,10 +37,12 @@ export function ListRow({
         <Text variant={dense ? "label" : "subheading"} numberOfLines={dense ? 2 : undefined}>
           {title}
         </Text>
-        {subtitle ? (
+        {typeof subtitle === "string" ? (
           <Text variant={dense ? "caption" : "body-sm"} tone="secondary" className="mt-0.5">
             {subtitle}
           </Text>
+        ) : subtitle ? (
+          <View className="mt-0.5">{subtitle}</View>
         ) : null}
       </View>
       {right ? <View className="ml-3">{right}</View> : null}
@@ -51,7 +55,7 @@ export function ListRow({
     <Pressable
       accessibilityRole={accessibilityRole}
       onPress={onPress}
-      className={cn(classes, "transition-colors hover:bg-surface-hover active:bg-surface-press")}
+      className={cn(classes, "transition-colors", WASH)}
     >
       {body}
     </Pressable>

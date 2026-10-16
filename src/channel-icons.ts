@@ -76,8 +76,6 @@ export const channelIcons = {
 
 export type ChannelIconName = keyof typeof channelIcons;
 
-export const channelIconNames = Object.keys(channelIcons) as ChannelIconName[];
-
 /** Own keys only: 'constructor' and the other prototype names are not icons. */
 export function isChannelIcon(v: string | null | undefined): v is ChannelIconName {
   return !!v && Object.hasOwn(channelIcons, v);

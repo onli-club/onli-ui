@@ -136,8 +136,6 @@ ${out.join("\n")}
 
 export type BadgeIconName = keyof typeof badgeIcons;
 
-export const badgeIconNames = Object.keys(badgeIcons) as BadgeIconName[];
-
 /** Own keys only: 'constructor' and the other prototype names are not icons. */
 export function isBadgeIcon(v: string | null | undefined): v is BadgeIconName {
   return !!v && Object.hasOwn(badgeIcons, v);

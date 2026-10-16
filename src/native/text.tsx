@@ -19,12 +19,10 @@ const TONES = {
   default: "text-ink",
   secondary: "text-ink-secondary",
   muted: "text-ink-muted",
-  faint: "text-ink-faint",
   inverse: "text-ink-inverse",
   brand: "text-brand",
   "on-brand": "text-on-brand",
   accent: "text-accent-strong",
-  gold: "text-gold",
   danger: "text-danger",
   "rarity-common": "text-rarity-common-ink",
   "rarity-uncommon": "text-rarity-uncommon-ink",
@@ -32,7 +30,7 @@ const TONES = {
   "rarity-legendary": "text-rarity-legendary-ink",
 } as const;
 
-export type TextVariant = keyof typeof VARIANTS;
+type TextVariant = keyof typeof VARIANTS;
 export type TextTone = keyof typeof TONES;
 // Literal class map (not `text-${size}`) so Tailwind's scanner sees every class.
 const SIZES = {

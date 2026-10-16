@@ -1,3 +1,4 @@
+import { BOX, n } from "./art";
 import { badgeArt, badgeArtPalette } from "./badge-art";
 import { badgeIcons, getBadgeIcon } from "./badge-icons";
 import { semantic } from "./tokens/colors";
@@ -14,10 +15,8 @@ import { semantic } from "./tokens/colors";
 export type BadgeRarity = "common" | "uncommon" | "rare" | "legendary";
 export type BadgeShape = "seal" | "hexagon" | "squircle" | "rosette" | "diamond";
 
-/** Everything is drawn in a 48-unit box; the frame sits on a 21-unit radius. */
-const BOX = 48;
+/** The centre of the box everything is drawn in. */
 const C = BOX / 2;
-const n = (v: number) => Number(v.toFixed(2)).toString();
 const rad = (deg: number) => (deg * Math.PI) / 180;
 
 /**

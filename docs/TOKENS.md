@@ -31,7 +31,6 @@ sessions (light, low-glare, high contrast for a 30–45 audience).
 | `brand-subtle` / `brand-faint` | `bg-brand-subtle` | Tonal fills, selected states |
 | `on-brand` | `text-on-brand` | Text/icons on brand fills |
 | `accent` / `accent-strong` / `accent-subtle` | `bg-accent-subtle` | Gamification only. `accent` fails contrast as text — use `accent-strong` for text |
-| `gold` | `bg-gold`, `text-gold`, `border-gold/30` | Achievement gold on a DARK surface only (the app's finished-course card on `brand-deep`): champagne (`amber-300`), where `accent` reads orange. Fails contrast on white or paper. Spent by `Text`/`Icon` `tone="gold"` and the `gold` `Pill` |
 | `heat-1` … `heat-4` | `bg-heat-3` | Activity-grid intensity ramp only (green-400 → 500 → 700 → 900). Starts at green-400 so a one-action day is ≥3:1 against the card. Level 0 is `surface-sunken`, not a heat token |
 
 | `danger` / `danger-strong` / `danger-subtle` | `text-danger` | Destructive |
@@ -41,10 +40,12 @@ sessions (light, low-glare, high contrast for a 30–45 audience).
 | `rarity-{common,uncommon,rare,legendary}-{bg,line,ink}` | `bg-rarity-rare-bg` | Badge rarity, pewter → green → blue → gold: `-bg` the solid face, `-line` the darker rim, `-ink` the white glyph/label. Spent by the rarity `Pill` and by the FALLBACK medal a badge without artwork gets — a badge with artwork carries its own hue in `badge-art.ts` |
 | `rank-{beginner…master}` | `text-rank-mentor` | One hue per rung of the standing ladder: stone, bronze, green, blue, violet, gold. The shield fill behind each rung's drawing (`rank-art.ts` adds its own lighter/darker tints) |
 
-Primitive scales (`green`, `sand`, `ink`, `amber`, `clay`, `steel`, `violet`, `bronze`) exist
-for the rare case a semantic token genuinely doesn't fit (e.g. avatar duos) — prefer adding a
-semantic token instead. `steel`, `violet` and `bronze` exist only to complete the
-gamification ladders and have no other use; amber doubles as the gold.
+Primitive scales (`green`, `sand`, `ink`, `amber`, `clay`, `steel`, `violet`, `bronze`) are
+what the semantic tokens are built from, and hold only the steps something references: add a
+step when a token needs one, delete it when nothing uses it. Read one directly only where no
+semantic token fits (the app's certificate artwork reads `tokens.primitives`) — otherwise add a
+semantic token. `steel`, `violet` and `bronze` exist only to complete the gamification
+ladders and have no other use; amber doubles as the gold.
 
 **Why gamification breaks the one-brand-colour rule.** Everywhere else, colour means brand or
 status. Rarity and rank are the exception on purpose: grey → green → blue → gold is a ladder
@@ -125,6 +126,9 @@ when they need these values.
 - **onli-admin / landing** (Tailwind 4): `@import "tailwindcss";` then
   `@import "@onli/ui/css/theme.css";`, `@import "@onli/ui/css/fonts-web.css";`, and
   `@import "@onli/ui/css/base.css";` — in that order.
+- **onli-server** (email templates): `@onli/ui/tokens`, the generated plain ESM. Beside the
+  token maps it carries `webFontHref` (the Google Fonts URL `fonts-web.css` names) and
+  `wordmarkSizes` (the logo's metrics), so the emails rebuild neither.
 - **css/fonts-web.css** (GENERATED, web consumers only): the family tokens name
   weight-specific TTF families (`Geist_600SemiBold`) that only expo-font can register, so on
   the web they resolve to nothing and text silently falls back to the system sans. This file
@@ -134,7 +138,9 @@ when they need these values.
   rules). The class vocabulary is unchanged — weight utilities stay banned in web consumers
   too. The host HTML must load Geist; the file's header comment carries the exact
   `<link>` tags.
-- **css/base.css** (GENERATED, all web consumers): shared base styles — currently the
-  app-wide thumb-only scrollbar treatment, with token hexes baked in so it works under
-  any Tailwind version. onli-app imports it in `app/_layout.tsx` (web no-op on native);
+- **css/base.css** (GENERATED, all web consumers): shared base styles — the app-wide
+  thumb-only scrollbar treatment, and the keyboard focus ring (`:focus-visible`, a 2px
+  `focus` outline offset 2px) inside `@layer base`, so a consumer's own rule (a field that
+  drops the ring for its border) wins over it. Token hexes are baked in so it works under any
+  Tailwind version. onli-app imports it in `app/_layout.tsx` (web no-op on native);
   onli-admin `@import`s it in `src/index.css` after tailwindcss.

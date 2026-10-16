@@ -3,23 +3,17 @@ import { Pressable, type PressableProps } from "react-native";
 import type { SemanticColor } from "../tokens/colors";
 import { cn } from "./cn";
 import { Icon } from "./icon";
+import { BRAND_FILL, PRESS, WASH } from "./recipes";
 
 const VARIANTS = {
-  default: {
-    box: "hover:bg-surface-hover active:bg-surface-press",
-    iconTone: "ink-secondary" as SemanticColor,
-  },
+  default: { box: WASH, iconTone: "ink-secondary" },
   /** Filled call-to-action (e.g. a send button). */
-  primary: {
-    box: "bg-brand hover:bg-brand-strong active:bg-brand-deep",
-    iconTone: "on-brand" as SemanticColor,
-  },
-} as const;
+  primary: { box: BRAND_FILL, iconTone: "on-brand" },
+} satisfies Record<string, { box: string; iconTone: SemanticColor }>;
 
 export function IconButton({
   icon,
   size = 20,
-  tone,
   variant = "default",
   className,
   disabled,
@@ -29,7 +23,6 @@ export function IconButton({
   /** Required: the glyph is the only visible content, so this is the button's whole name. */
   accessibilityLabel: string;
   size?: number;
-  tone?: SemanticColor;
   variant?: keyof typeof VARIANTS;
   className?: string;
 }) {
@@ -40,14 +33,15 @@ export function IconButton({
       hitSlop={6}
       disabled={disabled}
       className={cn(
-        "h-10 w-10 items-center justify-center rounded-full transition duration-press ease-out active:scale-[0.97]",
+        "h-10 w-10 items-center justify-center rounded-full",
+        PRESS,
         v.box,
         disabled && "opacity-40",
         className,
       )}
       {...props}
     >
-      <Icon icon={icon} size={size} tone={tone ?? v.iconTone} />
+      <Icon icon={icon} size={size} tone={v.iconTone} />
     </Pressable>
   );
 }

@@ -40,11 +40,9 @@ const PILL_TONES = {
     text: "rarity-legendary",
     glyph: "rarity-legendary-ink",
   },
-  // Achievement gold, on a dark surface only (docs/TOKENS.md).
-  gold: { box: "border border-gold/30 bg-gold/10", text: "gold", glyph: "gold" },
 } as const;
 
-export type PillTone = keyof typeof PILL_TONES;
+type PillTone = keyof typeof PILL_TONES;
 
 /**
  * Labelled pill for statuses (Pinned, Only you, processing…) and earned badges. `sm` is the

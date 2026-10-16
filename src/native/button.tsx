@@ -1,62 +1,40 @@
 import type { LucideIcon } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Pressable, type PressableProps, type ViewStyle } from "react-native";
-import Animated, { type CSSStyle, css, cubicBezier } from "react-native-reanimated";
-import { semantic } from "../tokens/colors";
+import { Pressable, type PressableProps, type ViewStyle } from "react-native";
+import Animated, { type CSSStyle, css } from "react-native-reanimated";
+import { type SemanticColor, semantic } from "../tokens/colors";
 import { motion } from "../tokens/motion";
 import { useReducedMotion } from "./a11y";
 import { cn } from "./cn";
+import { EASE_OUT } from "./easing";
 import { Icon } from "./icon";
 import type { KeyframeStyle } from "./keyframes";
-import { Text, type TextTone } from "./text";
+import { BRAND_FILL, DANGER_FILL, PRESS, WASH } from "./recipes";
+import { Spinner } from "./spinner";
+import { Text, type TextSize, type TextTone } from "./text";
+
+type Size = "sm" | "md" | "lg";
 
 // gap is a number, not a class: the icon and label live inside an Animated.View, and
-// NativeWind drops a className there.
-const SIZES = {
-  sm: { box: "min-h-9 px-4 rounded-full", gap: 6, text: "text-sm", icon: 15 },
-  md: { box: "min-h-11 px-5 rounded-full", gap: 8, text: "text-sm", icon: 17 },
-  lg: { box: "min-h-12 px-7 rounded-full", gap: 8, text: "text-base", icon: 19 },
-} as const;
+// NativeWind drops a className there. `text` is set only where it departs from the label's.
+const SIZES: Record<Size, { box: string; gap: number; icon: number; text?: TextSize }> = {
+  sm: { box: "min-h-9 px-4 rounded-full", gap: 6, icon: 15 },
+  md: { box: "min-h-11 px-5 rounded-full", gap: 8, icon: 17 },
+  lg: { box: "min-h-12 px-7 rounded-full", gap: 8, icon: 19, text: "base" },
+};
 
 const VARIANTS = {
-  primary: {
-    box: "bg-brand hover:bg-brand-strong active:bg-brand-deep",
-    tone: "on-brand",
-    iconTone: "on-brand",
-    spinner: semantic["on-brand"],
-  },
+  primary: { box: BRAND_FILL, tone: "on-brand", iconTone: "on-brand" },
   secondary: {
     box: "bg-surface border border-line-strong hover:bg-surface-solid-hover active:bg-surface-solid-press",
     tone: "default",
     iconTone: "ink",
-    spinner: semantic.ink,
   },
-  tonal: {
-    box: "bg-brand-subtle hover:bg-brand/20 active:bg-brand/30",
-    tone: "brand",
-    iconTone: "brand",
-    spinner: semantic.brand,
-  },
-  ghost: {
-    box: "hover:bg-surface-hover active:bg-surface-press",
-    tone: "brand",
-    iconTone: "brand",
-    spinner: semantic.brand,
-  },
-  danger: {
-    box: "bg-danger-subtle hover:bg-danger/20 active:bg-danger/30",
-    tone: "danger",
-    iconTone: "danger",
-    spinner: semantic.danger,
-  },
-} satisfies Record<
-  string,
-  { box: string; tone: TextTone; iconTone: Parameters<typeof Icon>[0]["tone"]; spinner: string }
->;
+  ghost: { box: WASH, tone: "brand", iconTone: "brand" },
+  danger: { box: DANGER_FILL, tone: "danger", iconTone: "danger" },
+} satisfies Record<string, { box: string; tone: TextTone; iconTone: SemanticColor }>;
 
-export type ButtonVariant = keyof typeof VARIANTS;
-
-const EASE_OUT = cubicBezier(...motion.curve.out);
+type ButtonVariant = keyof typeof VARIANTS;
 
 // A two-step dip needs two style commits as a transition, so the crossfade is one keyframe
 // animation instead: down over `press`, back up over `fast`.
@@ -83,7 +61,7 @@ export function Button({
 }: Omit<PressableProps, "children"> & {
   title: string;
   variant?: ButtonVariant;
-  size?: keyof typeof SIZES;
+  size?: Size;
   icon?: LucideIcon;
   loading?: boolean;
   /** 0–1: the button becomes its own progress indicator, busy but not dimmed. */
@@ -133,7 +111,8 @@ export function Button({
       accessibilityLabel={title}
       accessibilityState={{ busy: loading || busy }}
       className={cn(
-        "flex-row items-center justify-center transition duration-press ease-out active:scale-[0.97]",
+        "flex-row items-center justify-center",
+        PRESS,
         s.box,
         v.box,
         busy && "overflow-hidden",
@@ -145,14 +124,14 @@ export function Button({
     >
       {fill ? <Animated.View aria-hidden style={fill} /> : null}
       {loading ? (
-        <ActivityIndicator size="small" color={v.spinner} />
+        <Spinner size="small" tone={v.iconTone} />
       ) : (
         <Animated.View
           key={dip}
           style={[{ flexDirection: "row", alignItems: "center", flexShrink: 1, gap: s.gap }, fade]}
         >
           {icon ? <Icon icon={icon} size={s.icon} tone={v.iconTone} strokeWidth={2} /> : null}
-          <Text variant="label" tone={v.tone} className={s.text}>
+          <Text variant="label" tone={v.tone} size={s.text}>
             {title}
           </Text>
         </Animated.View>

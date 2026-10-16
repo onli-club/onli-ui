@@ -1,3 +1,4 @@
+import { BOX } from "./art";
 import { isRankKey, rankArt, rankArtPalette } from "./rank-art";
 
 /**
@@ -18,9 +19,6 @@ import { isRankKey, rankArt, rankArtPalette } from "./rank-art";
  * `muted` is a rung the member has not reached: the same drawing in the paper's greys, the
  * way a locked badge is, which is what makes reaching it read as a gain.
  */
-
-/** Drawn in the same 48-unit box as the badges, so the two systems share one scale. */
-const BOX = 48;
 
 /**
  * Flat top with rounded shoulders, sides that fall straight to just below the middle, then

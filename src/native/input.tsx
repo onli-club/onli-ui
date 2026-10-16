@@ -1,18 +1,16 @@
 import { TextInput, type TextInputProps, View } from "react-native";
 import { semantic } from "../tokens/colors";
 import { cn } from "./cn";
-import { FormError } from "./form-error";
 import { Text } from "./text";
 
 export function Input({
   label,
-  error,
   helper,
   className,
   multiline,
   accessibilityLabel,
   ...props
-}: TextInputProps & { label?: string; error?: string; helper?: string; className?: string }) {
+}: TextInputProps & { label?: string; helper?: string; className?: string }) {
   return (
     <View className={className}>
       {label ? (
@@ -22,10 +20,8 @@ export function Input({
       ) : null}
       <TextInput
         accessibilityLabel={accessibilityLabel ?? label}
-        aria-invalid={!!error}
         className={cn(
-          "rounded-lg border bg-surface px-4 py-3 font-body text-base text-ink",
-          error ? "border-danger" : "border-line-input focus:border-focus",
+          "rounded-lg border border-line-input bg-surface px-4 py-3 font-body text-base text-ink focus:border-focus",
           multiline && "min-h-[120px]",
         )}
         placeholderTextColor={semantic["ink-muted"]}
@@ -33,9 +29,7 @@ export function Input({
         textAlignVertical={multiline ? "top" : "center"}
         {...props}
       />
-      {error ? (
-        <FormError message={error} size="caption" className="mt-1" />
-      ) : helper ? (
+      {helper ? (
         <Text variant="caption" className="mt-1">
           {helper}
         </Text>

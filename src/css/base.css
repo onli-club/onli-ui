@@ -22,3 +22,12 @@
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+/* One brand ring for every keyboard-focused control. Layered, so a consumer's own rule (a
+   field that keeps its border signal instead) wins over it. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid #3b7d62;
+    outline-offset: 2px;
+  }
+}

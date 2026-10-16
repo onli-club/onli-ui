@@ -1,4 +1,4 @@
-import { type BadgeArtPalette, LOCKED_PALETTE } from "./badge-art";
+import { type Art, type BadgeArtPalette, LOCKED_PALETTE, n, WHITE } from "./art";
 import { semantic } from "./tokens/colors";
 
 /**
@@ -36,18 +36,12 @@ const HUES: Record<RankKey, { bg: string; soft: string; deep: string }> = {
   master: { bg: semantic["rank-master"], soft: "#F0CB8A", deep: "#6B4410" },
 };
 
-const WHITE = "#FFFFFF";
-
 /**
  * Offset of the deep shadow under the arrow, bolt and crown. Small on purpose: the shield
  * narrows fast below y=30, and a 1.6-unit offset pushed the arrow's and crown's shadows
  * through the edge.
  */
 const SHADOW = "1.2 1.4";
-
-type Art = (p: BadgeArtPalette) => string;
-
-const n = (v: number) => Number(v.toFixed(2)).toString();
 
 /** Points of a five-pointed star, outer tip straight up. */
 function starPoints(cx: number, cy: number, outer: number, inner: number) {
@@ -159,8 +153,6 @@ const ART = {
 
 export type RankKey = keyof typeof ART;
 
-export const rankKeys = Object.keys(ART) as RankKey[];
-
 /** Own keys only: 'constructor' and the other prototype names are not rungs. */
 export function isRankKey(v: string | null | undefined): v is RankKey {
   return !!v && Object.hasOwn(ART, v);
@@ -175,10 +167,7 @@ export function rankArtPalette(key: RankKey, muted: boolean): BadgeArtPalette {
   return { ...HUES[key], ink: WHITE };
 }
 
-/** The drawing's body for a rung, or undefined for a key that is not one of the six. */
-export function rankArt(
-  key: string | null | undefined,
-  palette: BadgeArtPalette,
-): string | undefined {
-  return isRankKey(key) ? ART[key](palette) : undefined;
+/** The drawing's body for a rung. */
+export function rankArt(key: RankKey, palette: BadgeArtPalette): string {
+  return ART[key](palette);
 }

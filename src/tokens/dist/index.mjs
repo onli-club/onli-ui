@@ -3,8 +3,6 @@ export const primitives = {
   "green": {
     "50": "#EFF5F1",
     "100": "#DFEBE4",
-    "200": "#BFD7CB",
-    "300": "#95BAA8",
     "400": "#639A80",
     "500": "#3B7D62",
     "600": "#20614E",
@@ -18,15 +16,13 @@ export const primitives = {
     "200": "#F1EFEA",
     "300": "#E8E5DE",
     "400": "#D7D3C9",
-    "500": "#B5B0A2",
     "600": "#8A8578"
   },
   "ink": {
     "300": "#A9B2AA",
     "400": "#5D6961",
     "500": "#57635C",
-    "700": "#232B26",
-    "900": "#20281F"
+    "700": "#232B26"
   },
   "amber": {
     "100": "#FAEDD4",
@@ -37,26 +33,18 @@ export const primitives = {
     "800": "#6F4712"
   },
   "steel": {
-    "100": "#E4EDF8",
-    "300": "#93B6E0",
     "500": "#4A7CB5",
     "600": "#2F6098",
     "700": "#264E7C"
   },
   "violet": {
-    "100": "#EDE8F9",
-    "300": "#B8A0E2",
-    "500": "#7A56B5",
-    "600": "#63449A",
-    "700": "#4F357C"
+    "500": "#7A56B5"
   },
   "bronze": {
-    "500": "#B4763C",
-    "600": "#96602F"
+    "500": "#B4763C"
   },
   "clay": {
     "100": "#F9E5DE",
-    "400": "#D06A52",
     "500": "#C9573F",
     "600": "#A83F2C",
     "700": "#8A3222"
@@ -94,7 +82,6 @@ export const semantic = {
   "accent": "#DE9A3D",
   "accent-strong": "#95601A",
   "accent-subtle": "#FAEDD4",
-  "gold": "#EFC788",
   "danger": "#A83F2C",
   "danger-strong": "#8A3222",
   "danger-subtle": "#F9E5DE",
@@ -181,6 +168,7 @@ export const fontWeights = {
   "body-bold": 600
 };
 export const webFontFamily = "Geist";
+export const webFontHref = "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap";
 export const fontSizes = {
   "xs": [
     12,
@@ -210,4 +198,16 @@ export const fontSizes = {
     28,
     34
   ]
+};
+export const wordmarkSizes = {
+  "sm": {
+    "fontSize": 22,
+    "lineHeight": 28,
+    "letterSpacing": -0.5
+  },
+  "md": {
+    "fontSize": 24,
+    "lineHeight": 30,
+    "letterSpacing": -0.6
+  }
 };

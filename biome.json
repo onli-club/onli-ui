@@ -35,18 +35,5 @@
     "formatter": {
       "quoteStyle": "double"
     }
-  },
-  "overrides": [
-    {
-      "includes": [
-        "src/tailwind/preset.js",
-        "src/tokens/dist/**",
-        "src/css/theme.css",
-        "src/css/fonts-web.css",
-        "src/css/wordmark.css"
-      ],
-      "formatter": { "enabled": false },
-      "linter": { "enabled": false }
-    }
-  ]
+  }
 }
