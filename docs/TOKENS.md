@@ -143,4 +143,6 @@ when they need these values.
   `focus` outline offset 2px) inside `@layer base`, so a consumer's own rule (a field that
   drops the ring for its border) wins over it. Token hexes are baked in so it works under any
   Tailwind version. onli-app imports it in `app/_layout.tsx` (web no-op on native);
-  onli-admin `@import`s it in `src/index.css` after tailwindcss.
+  onli-admin `@import`s it in `src/index.css` after tailwindcss. A consumer whose base styles
+  are unlayered (Tailwind 3, onli-app) keeps its own `:focus-visible` rule, because the
+  layered one loses to preflight's `:-moz-focusring` there.

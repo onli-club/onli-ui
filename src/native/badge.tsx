@@ -29,7 +29,6 @@ const PILL_TONES = {
   neutral: { box: "bg-surface-sunken", text: "muted", glyph: "ink-muted" },
   brand: { box: "bg-brand-subtle", text: "brand", glyph: "brand" },
   accent: { box: "bg-accent-subtle", text: "accent", glyph: "accent-strong" },
-  danger: { box: "bg-danger-subtle", text: "danger", glyph: "danger" },
   // Rarity ramp for earned badges — grey, green, blue, gold, the ladder games already
   // taught everyone. Matches BadgeMedal exactly: one rarity must never wear two colours.
   common: { box: "bg-rarity-common-bg", text: "rarity-common", glyph: "rarity-common-ink" },

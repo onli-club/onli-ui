@@ -3,6 +3,7 @@ import { type LayoutChangeEvent, Pressable, View, type ViewStyle } from "react-n
 import Animated, { type CSSStyle } from "react-native-reanimated";
 import { motion, semantic, shadows } from "../tokens";
 import { useReducedMotion } from "./a11y";
+import { Pill } from "./badge";
 import { cn } from "./cn";
 import { EASE_IN_OUT } from "./easing";
 import { WASH } from "./recipes";
@@ -100,13 +101,7 @@ export function Segmented<T extends string>({
                 >
                   {o.label}
                 </Text>
-                {o.count ? (
-                  <View className="min-w-[18px] items-center rounded-full bg-brand-subtle px-1.5">
-                    <Text variant="label" tone="brand" className="text-[11px] leading-[16px]">
-                      {o.count}
-                    </Text>
-                  </View>
-                ) : null}
+                {o.count ? <Pill label={String(o.count)} tone="brand" /> : null}
               </View>
             </Pressable>
           );

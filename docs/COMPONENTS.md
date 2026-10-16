@@ -79,7 +79,7 @@ colour is never the only cue. Pressable chips report `selected` state and carry 
 `<CountBadge count>` — unread counter (`danger` fill, 6:1 with the label, 11px), caps at 99+,
 renders nothing at 0. Hidden from assistive tech: put the count in the label of the control
 it decorates ("Notifications, 3 unread").
-`<Pill label tone size icon>` — status pill. Status tones: `neutral | brand | accent | danger`.
+`<Pill label tone size icon>` — status pill. Status tones: `neutral | brand | accent`.
 Rarity tones for earned badges: `common | uncommon | rare | legendary` — the grey → green →
 blue → gold ladder, identical to `BadgeMedal`'s, so a rarity never wears two colours. `icon`
 (a lucide glyph) goes before the label in the label's colour,
@@ -113,7 +113,7 @@ string or a node: a node goes under the title as it is, for a line of icon + val
 ## Segmented
 `<Segmented options value onChange>` — pill switcher (e.g. Top/New) on a sunken track.
 Exposed as a `tablist` of `tab`s with the active one `selected`. An option's `count` is a
-small brand chip after its label (Notes 3); a label never carries its count after a separator.
+brand `Pill` after its label (Notes 3); a label never carries its count after a separator.
 
 One white pill **slides** between the options rather than each option re-colouring: a single
 reanimated view under the labels, transitioning to the active option's measured x and width
