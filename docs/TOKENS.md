@@ -146,3 +146,7 @@ when they need these values.
   onli-admin `@import`s it in `src/index.css` after tailwindcss. A consumer whose base styles
   are unlayered (Tailwind 3, onli-app) keeps its own `:focus-visible` rule, because the
   layered one loses to preflight's `:-moz-focusring` there.
+- **css/panel.css** (hand-written, the web panels only): imported last, after `wordmark.css`.
+  The panel kit's easing, animations and keyframes, the `dialog-open` variant and the base
+  layer, plus `@source "../panel"` so the panel's Tailwind scans `src/panel/` (see
+  COMPONENTS.md → Panel kit).

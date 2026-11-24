@@ -359,3 +359,46 @@ edge at y≈10-11, nothing wider than ±10 once below y=30 — and every element
 keeps at least 3.5 units from the outline. Check margins numerically against the shield's
 curve rather than by eye: the first arrow and crown shadows leaked through the lower edge
 and only a 96px render showed it.
+
+## Panel kit (`@onli/ui/panel`)
+The web panels' kit (onli-admin, onli-creators): plain React DOM components with Tailwind 4
+classes, in `src/panel/`. `onli-app` never imports it, so Metro never sees it. Its CSS is
+`@onli/ui/css/panel.css` (the motion tokens, keyframes, the `dialog-open` variant and the base
+layer), which also names `src/panel/` with `@source` so a panel's Tailwind generates the
+kit's classes.
+
+| Module | Holds |
+|---|---|
+| `ui.tsx` | the components: `PageHeader`, `PageActions`/`HeaderSlot`, `Breadcrumb`, `Card`, `Table`/`Th`/`Td`/`Row`, `RowOpener`/`RowIdentity`, `Pager`, `Segmented`, `Tabs`, `Pill`, `MetaLine`, `Chips`, `Button`, `LinkButton`, `Field`, `WithUnit`, `Select`, `Checkbox`, `Switch`, `ArchivedToggle`, `Note`, `Stat`, `Thumbnail`, `Avatar`, `SvgImage`, `Facts`, `ItemList`/`Item`, `EmptyState`, `DetailFallback`, `PickList`, `FormFooter`, `DialogFooter`, `Spinner`, `ProgressBar`, `Modal`, `FormModal`, `Drawer`, `Menu`, the `useDialogFocus`/`useAnchoredPosition` hooks and the `inputCls`/`iconButtonCls`/`roundIconButtonCls` class strings |
+| `feedback.tsx` | `ConfirmProvider`/`useConfirm`, `ToastProvider`/`useToast` |
+| `api.ts` | `api`, `ApiError`, `toApiError`, `apiUrl`, `APP_URL`, `PAGE_SIZE` (reads `VITE_API_URL` and `VITE_APP_URL` from the panel's env) |
+| `query-client.ts` | `queryClient` (a 401 drops `["me"]` to null and the rest of the cache), `useMe<T extends Me>()`, `signOut`, `useApiMutation`, `apiMessage` |
+| `format.ts`, `changes.ts`, `use-debounced.ts`, `emails.ts` | IST dates and times, `inr`, `plural`, `listFirst`; `changedFields`; `useDebounced`; `parseEmails`/`notEmails` |
+| `upload.ts`, `uploads.tsx`, `encode.ts` | upload limits and the presign, PUT, complete path (`MediaRow`, `MediaStatus`); `UploadProvider`/`useUploads` and the tray; the in-browser video encode |
+| `file-picker.tsx`, `upload-dialog.tsx` | `FilePicker`, `UploadDialog` |
+| `shell.tsx` | `PanelShell` |
+
+`@onli/ui/panel/encode` is the encoder alone, so a panel's test can mock the module
+`uploads.tsx` imports.
+
+**`Pill`** never wraps (`whitespace-nowrap`): every pill in the panels is a short state, and a
+wrapped one turns into a tall blob in a narrow table cell.
+
+**`PanelShell`** is the sidebar (wordmark, nav, the signed-in email and Sign out) and the main
+column. Sign-in, a "not authorised" screen and role gates stay with each panel's root. A panel
+mounts `UploadProvider` (and with it the tray) only if it queues uploads: onli-creators does;
+onli-admin, whose one file is the access-list import sent with `postFileWithProgress`, does
+not. The root passes the shell what differs:
+
+| Prop | |
+|---|---|
+| `product` | the word beside the wordmark and in the tab title ("Admin", "Creators") |
+| `groups` | `{ label?, rows: { to, label, icon, count? }[] }[]`, already filtered to what this person may see; no empty group. A group without a `label` has no heading (the creators panel's single group). Only the `activeTo` row is the current page (`aria-current`): the links match exactly, so the router does not also mark a row whose address starts the page's. A `count` above 0 shows as a pill, and as a dot on the icon rail below `lg` |
+| `activeTo` | the `to` of the row to light up |
+| `header` | `{ title, subtitle? }` for a section route: the shell renders the `PageHeader` with the `PageActions` slot and wraps the screen in its `max-w-5xl` column. Absent on a detail route, which renders its own header and width |
+| `email` | the signed-in account, above Sign out |
+| `navTop` | rendered between the wordmark and the nav (the creators panel's creator switcher) |
+
+The tab title is `{title} | Onli {product}`, or `Onli {product}` without a header; after the
+first render a change of title moves focus to the page's `h1`. Both Sign out controls call
+`signOut`.

@@ -13,5 +13,6 @@
     "allowJs": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "scripts/**/*.ts", "nativewind-env.d.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "scripts/**/*.ts", "nativewind-env.d.ts"],
+  "exclude": ["src/panel"]
 }

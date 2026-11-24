@@ -1,7 +1,7 @@
 # onli-ui — Onli design system
 
-Token-first design system shared by `onli-app` (NativeWind 4 / Tailwind 3.4), `onli-admin`
-(Tailwind 4), and the future landing page. Plan and cross-repo decisions:
+Token-first design system shared by `onli-app` (NativeWind 4 / Tailwind 3.4), the web panels
+`onli-admin` and `onli-creators` (Tailwind 4), and the future landing page. Plan and cross-repo decisions:
 `onli-server/docs/DESIGN-SYSTEM.md`.
 
 ## Structure
@@ -13,6 +13,15 @@ Token-first design system shared by `onli-app` (NativeWind 4 / Tailwind 3.4), `o
   commit the outputs.
 - `src/native/` — React Native components (NativeWind classNames), shipped as TypeScript
   source; the consuming app's Metro/babel compiles them.
+- `src/panel/` — the web panels' kit, entry `@onli/ui/panel` (plain React DOM + Tailwind 4,
+  TypeScript source the panel's Vite compiles): the components, confirm and toasts, the API
+  client (`VITE_API_URL`/`VITE_APP_URL` come from the panel's env), the query client with
+  `useMe` and `signOut`, formatting, uploads and the video encoder, and `PanelShell` (sidebar,
+  header, tab title). onli-admin and onli-creators import it; `onli-app` never does, and
+  `src/index.ts` never re-exports it. Docs: `docs/COMPONENTS.md` → Panel kit.
+- `src/css/panel.css` — HAND-WRITTEN, not generated (`generate` never touches it): the panels'
+  motion tokens, keyframes, `dialog-open` variant and base layer, plus `@source "../panel"` so a
+  panel's Tailwind scans `src/panel/` wherever the kit is read from.
 - `src/fonts.ts` — expo-font map (Geist 400/500/600/700; one family, weight-specific TTFs).
   Web consumers can't register those per-weight families, so they load Geist from Google
   Fonts and `@import` `src/css/fonts-web.css`, which re-points the family tokens and applies
@@ -26,16 +35,20 @@ Token-first design system shared by `onli-app` (NativeWind 4 / Tailwind 3.4), `o
   already has (react-native-svg, lucide-react-native, react-native-reanimated — NativeWind's
   `transition-*` classes run on it, and `Button`/`Segmented` import it directly,
   @expo-google-fonts/geist). `expo-font` is the app's concern: the kit
-  only exports the font map.
+  only exports the font map. The panel kit's peers are the panels' own dependencies:
+  react-dom, lucide-react, @tanstack/react-router, @tanstack/react-query and mediabunny. Every
+  peer but `react` is optional, so onli-app and onli-server, which install this package too,
+  never pull in the other side's.
 - Consumers install this repo from git (`"@onli/ui": "github:onli-club/onli-ui#main"`), so a
   change is only visible to them once it is pushed and they run `bun update @onli/ui`; onli-app's Metro
-  serves the sibling checkout live for local work. Breaking API changes must be applied to
-  `onli-app` in the same working session.
+  serves the sibling checkout live for local work, and the two web panels read it live in Vite,
+  Vitest and `tsc` (their `kit.ts` aliases and `tsconfig.app.json` `paths`). Breaking API changes must be applied to
+  `onli-app` (and, in `src/panel`, to both panels) in the same working session.
 
 ## Commands
 ```
 bun run generate    # tokens -> preset.js + theme.css
-bun run typecheck
+bun run typecheck   # tsconfig.json (everything but src/panel), then tsconfig.panel.json (src/panel: DOM, vite/client)
 bun run lint
 bun run format
 ```
